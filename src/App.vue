@@ -4,7 +4,7 @@
       <div class="header-table">
         <div class="header-row">
           <div class="header-cell header-title-cell">
-            <h1>TASKgram</h1>
+            <img src="@/media/logo.png" alt="TASKgram logo" class="app-logo" />
           </div>
           <div class="header-cell header-btn-cell">
             <button v-if="userStore.isOwner" class="icon-btn" @click="showUsers = !showUsers" title="Пользователи">
@@ -168,5 +168,14 @@ h2, h3, h4, h5 {
   main {
     padding: 5px 0 0 0;
   }
+}
+
+.app-logo {
+  height: 44px;
+  width: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: inline-block;
+  vertical-align: middle;
 }
 </style> 
