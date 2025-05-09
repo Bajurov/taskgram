@@ -58,10 +58,6 @@
       >
         <div class="project-title">{{ project.title }}</div>
         <div class="project-description">{{ project.description }}</div>
-        <div v-if="debugProjectId === project.id" class="debug-info">
-          <strong>DEBUG:</strong> Клик по проекту (id: {{ project.id }})
-          <div v-if="debugRouterMsg" class="debug-router-msg">{{ debugRouterMsg }}</div>
-        </div>
       </div>
     </div>
     <div v-else class="empty-message">
@@ -97,17 +93,12 @@ const filteredProjects = computed(() => {
     : projectsStore.archivedProjects;
 });
 
-const debugProjectId = ref<string | null>(null);
-const debugRouterMsg = ref<string | null>(null);
-
 function navigateToProject(id: string) {
   router.push(`/project/${id}`)
     .then(() => {
-      debugRouterMsg.value = 'router.push resolved';
       console.log('router.push resolved');
     })
     .catch(e => {
-      debugRouterMsg.value = 'router.push error: ' + e;
       console.error('router.push error', e);
     });
 }
@@ -128,12 +119,6 @@ function addProject() {
 }
 
 function handleProjectClick(id: string) {
-  debugProjectId.value = id;
-  debugRouterMsg.value = null;
-  setTimeout(() => {
-    debugProjectId.value = null;
-    debugRouterMsg.value = null;
-  }, 10000);
   console.log('Project card clicked:', id);
   navigateToProject(id);
 }
@@ -292,17 +277,5 @@ textarea {
   text-align: center;
   color: #b6ffb0aa;
   padding: 30px;
-}
-
-.debug-info {
-  color: #ff6b6b;
-  margin-top: 10px;
-  font-size: 0.95rem;
-}
-
-.debug-router-msg {
-  color: #b6ffb0;
-  margin-top: 6px;
-  font-size: 0.95rem;
 }
 </style> 

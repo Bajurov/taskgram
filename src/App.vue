@@ -3,10 +3,8 @@
     <header v-if="userStore.currentUser" class="app-header">
       <div class="header-left">
         <h1>TASKgram</h1>
-        <span class="role">{{ userStore.currentUser.role === 'owner' ? 'Владелец' : '' }}</span>
       </div>
       <div class="header-actions">
-        <span class="user-name">{{ userStore.currentUser.name }}</span>
         <button v-if="userStore.isOwner" class="icon-btn" @click="showUsers = !showUsers" title="Пользователи">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#b6ffb0" stroke-width="2"/><path d="M4 20c0-2.2 3.6-4 8-4s8 1.8 8 4" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
@@ -85,24 +83,10 @@ body {
   margin-right: 0.5em;
 }
 
-.role {
-  font-size: 0.95rem;
-  color: #e0ffe0;
-  font-weight: 600;
-  opacity: 0.7;
-}
-
 .header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.user-name {
-  font-size: 1rem;
-  color: #e0ffe0;
-  font-weight: 500;
-  margin-right: 2px;
 }
 
 .icon-btn {
