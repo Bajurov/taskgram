@@ -51,7 +51,10 @@
         v-for="project in filteredProjects" 
         :key="project.id" 
         class="project-card"
-        @click="navigateToProject(project.id)"
+        tabindex="0"
+        role="button"
+        style="pointer-events: auto; z-index: 1;"
+        @click="handleProjectClick(project.id)"
       >
         <div class="project-title">{{ project.title }}</div>
         <div class="project-description">{{ project.description }}</div>
@@ -107,6 +110,11 @@ function addProject() {
   newProject.value.title = '';
   newProject.value.description = '';
   showAddForm.value = false;
+}
+
+function handleProjectClick(id: string) {
+  console.log('Project card clicked:', id);
+  navigateToProject(id);
 }
 </script>
 
