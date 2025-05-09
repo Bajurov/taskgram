@@ -1,11 +1,18 @@
 <template>
   <div class="app-container">
     <header v-if="userStore.currentUser" class="app-header">
-      <h1>TASKgram</h1>
-      <div class="user-info">
-        <span>{{ userStore.currentUser.name }}</span>
-        <button v-if="userStore.isOwner" @click="showUsers = !showUsers">Пользователи</button>
-        <button @click="logout">Выйти</button>
+      <div class="header-left">
+        <h1>TASKgram</h1>
+        <span class="role">{{ userStore.currentUser.role === 'owner' ? 'Владелец' : '' }}</span>
+      </div>
+      <div class="header-actions">
+        <span class="user-name">{{ userStore.currentUser.name }}</span>
+        <button v-if="userStore.isOwner" class="icon-btn" @click="showUsers = !showUsers" title="Пользователи">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#b6ffb0" stroke-width="2"/><path d="M4 20c0-2.2 3.6-4 8-4s8 1.8 8 4" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button class="icon-btn" @click="logout" title="Выйти">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M16 17l5-5-5-5" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12H9" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 19v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v2" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
     </header>
     <main>
@@ -54,41 +61,75 @@ body {
 .app-header {
   background: linear-gradient(90deg, #1e2a22 0%, #1a3c2b 100%);
   color: #fff;
-  padding: 18px 24px 14px 24px;
+  padding: 8px 18px 6px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 12px 0 rgba(0,0,0,0.18);
   border-bottom: 1.5px solid #22332a;
+  min-height: 48px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .app-header h1 {
-  font-size: 2.1rem;
+  font-size: 1.25rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   color: #b6ffb0;
-  text-shadow: 0 2px 8px #0a1a0e44;
+  text-shadow: 0 2px 8px #0a1a0e44, 0 0 2px #000;
+  margin-right: 0.5em;
 }
 
-.user-info {
+.role {
+  font-size: 0.95rem;
+  color: #e0ffe0;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 }
 
-.user-info span {
-  font-size: 1.1rem;
-  font-weight: 600;
+.user-name {
+  font-size: 1rem;
   color: #e0ffe0;
+  font-weight: 500;
+  margin-right: 2px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  border-radius: 50%;
+  padding: 6px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.icon-btn:hover {
+  background: #2e4e3f;
 }
 
 button {
   background: linear-gradient(90deg, #2e4e3f 0%, #1a3c2b 100%);
   color: #b6ffb0;
   border: none;
-  border-radius: 18px;
-  padding: 10px 22px;
-  font-size: 1rem;
+  border-radius: 16px;
+  padding: 7px 16px;
+  font-size: 0.98rem;
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 2px 8px 0 #0a1a0e22;
@@ -102,14 +143,20 @@ button:hover {
 }
 
 main {
-  padding: 32px 0 0 0;
+  padding: 24px 0 0 0;
   min-height: 80vh;
   max-width: 600px;
   margin: 0 auto;
 }
 
+h2, h3, h4, h5 {
+  color: #eaffd0;
+  text-shadow: 0 2px 8px #0a1a0e44, 0 0 2px #000;
+  font-weight: 700;
+}
+
 @media (max-width: 600px) {
-  .app-header, .user-info {
+  .app-header, .header-actions, .header-left {
     flex-direction: column !important;
     align-items: stretch !important;
   }

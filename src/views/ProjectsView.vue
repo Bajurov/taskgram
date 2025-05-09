@@ -2,8 +2,20 @@
   <div class="projects-container">
     <div class="projects-header">
       <h2>Проекты</h2>
-      <button v-if="userStore.isManager" @click="showAddForm = !showAddForm">
-        {{ showAddForm ? 'Отмена' : 'Добавить проект' }}
+      <button
+        v-if="userStore.isManager"
+        class="add-project-btn"
+        @click="showAddForm = !showAddForm"
+        :title="showAddForm ? 'Отмена' : 'Добавить проект'"
+      >
+        <svg v-if="!showAddForm" width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="12" fill="#b6ffb0"/>
+          <path d="M12 7v10M7 12h10" stroke="#181c1f" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg v-else width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="12" fill="#ff6b6b"/>
+          <path d="M7 12h10" stroke="#181c1f" stroke-width="2" stroke-linecap="round"/>
+        </svg>
       </button>
     </div>
 
@@ -16,7 +28,7 @@
         <label for="description">Описание</label>
         <textarea id="description" v-model="newProject.description" placeholder="Введите описание проекта"></textarea>
       </div>
-      <button @click="addProject">Создать проект</button>
+      <button class="create-btn" @click="addProject">Создать проект</button>
     </div>
 
     <div class="tabs">
@@ -111,12 +123,38 @@ function addProject() {
   margin-bottom: 20px;
 }
 
+.projects-header h2 {
+  color: #eaffd0;
+  text-shadow: 0 2px 8px #0a1a0e44, 0 0 2px #000;
+  font-weight: 800;
+  font-size: 1.35rem;
+  margin: 0;
+}
+
+.add-project-btn {
+  background: none;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 2px 8px #0a1a0e22;
+}
+.add-project-btn:hover {
+  background: #2e4e3f;
+}
+
 .add-project-form {
-  background-color: white;
-  border-radius: 8px;
+  background: #23282d;
+  border-radius: 14px;
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
 .form-group {
@@ -126,40 +164,67 @@ function addProject() {
 label {
   display: block;
   margin-bottom: 5px;
-  font-weight: bold;
+  font-weight: 600;
+  color: #b6ffb0;
 }
 
 input, textarea {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+  border: 1.5px solid #2e4e3f;
+  border-radius: 8px;
+  font-size: 15px;
+  background: #181c1f;
+  color: #f5f6fa;
+  outline: none;
+  transition: border 0.2s;
+}
+input:focus, textarea:focus {
+  border: 1.5px solid #b6ffb0;
 }
 
 textarea {
-  min-height: 100px;
+  min-height: 80px;
   resize: vertical;
+}
+
+.create-btn {
+  background: linear-gradient(90deg, #2e4e3f 0%, #1a3c2b 100%);
+  color: #b6ffb0;
+  border: none;
+  border-radius: 14px;
+  padding: 8px 18px;
+  font-size: 0.98rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px 0 #0a1a0e22;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.create-btn:hover {
+  background: linear-gradient(90deg, #3fa34d 0%, #1a3c2b 100%);
+  color: #fff;
 }
 
 .tabs {
   display: flex;
   margin-bottom: 20px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1.5px solid #2e4e3f;
 }
 
 .tabs button {
   background: none;
   border: none;
-  padding: 10px 20px;
-  color: #555;
+  padding: 8px 18px;
+  color: #b6ffb0;
   cursor: pointer;
   border-bottom: 2px solid transparent;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: color 0.2s, border 0.2s;
 }
-
 .tabs button.active {
-  color: #0088cc;
-  border-bottom: 2px solid #0088cc;
+  color: #3fa34d;
+  border-bottom: 2px solid #3fa34d;
 }
 
 .projects-list {
@@ -169,33 +234,34 @@ textarea {
 }
 
 .project-card {
-  background-color: white;
-  border-radius: 8px;
+  background: #23282d;
+  border-radius: 14px;
   padding: 20px;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
   transition: all 0.2s ease;
 }
-
 .project-card:hover {
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.22);
   transform: translateY(-2px);
 }
 
 .project-title {
-  font-weight: bold;
-  font-size: 18px;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: #eaffd0;
+  text-shadow: 0 2px 8px #0a1a0e44, 0 0 2px #000;
   margin-bottom: 10px;
 }
 
 .project-description {
-  color: #666;
-  font-size: 14px;
+  color: #b6ffb0;
+  font-size: 0.98rem;
 }
 
 .empty-message {
   text-align: center;
-  color: #666;
+  color: #b6ffb0aa;
   padding: 30px;
 }
 </style> 
