@@ -19,8 +19,8 @@ export interface Task {
   title: string;
   description: string;
   deadline: string;
-  projectId: string;
-  creatorId: string;
+  projectid: string;
+  creatorid: string;
   assignees: string[];
   status: 'new' | 'in_progress' | 'done' | 'backlog';
   comments: Comment[];
@@ -37,8 +37,8 @@ export interface Access {
 
 export interface Comment {
   id: string;
-  taskId: string;
-  authorId: string;
+  taskid: string;
+  authorid: string;
   text: string;
-  createdAt: string;
+  createdat: string;
 } 

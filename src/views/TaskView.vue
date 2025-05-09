@@ -16,7 +16,7 @@
         <strong>Дедлайн:</strong> {{ formatDate(task.deadline) }}
       </div>
       <div class="meta-item">
-        <strong>Постановщик:</strong> {{ getUsername(task.creatorId) }}
+        <strong>Постановщик:</strong> {{ getUsername(task.creatorid) }}
       </div>
       <div class="meta-item">
         <strong>Исполнители:</strong> 
@@ -74,10 +74,10 @@
           v-for="comment in task.comments" 
           :key="comment.id" 
           class="chat-message"
-          :class="{ 'own-message': comment.authorId === userStore.currentUser?.id }"
+          :class="{ 'own-message': comment.authorid === userStore.currentUser?.id }"
         >
           <div class="message-header">
-            <strong>{{ getUsername(comment.authorId) }}</strong>
+            <strong>{{ getUsername(comment.authorid) }}</strong>
             <span class="message-time">{{ formatDateTime(comment.createdAt) }}</span>
           </div>
           <div class="message-text">{{ comment.text }}</div>
@@ -122,14 +122,14 @@ const task = computed(() =>
 
 const projectName = computed(() => {
   if (!task.value) return '';
-  const project = projectsStore.projects.find(p => p.id === task.value?.projectId);
+  const project = projectsStore.projects.find(p => p.id === task.value?.projectid);
   return project ? project.title : '';
 });
 
 const canEdit = computed(() => {
   if (!task.value || !userStore.currentUser) return false;
   
-  const isCreator = task.value.creatorId === userStore.currentUser.id;
+  const isCreator = task.value.creatorid === userStore.currentUser.id;
   const isManager = userStore.isManager;
   
   return isCreator || isManager;
@@ -139,7 +139,7 @@ const canChangeStatus = computed(() => {
   if (!task.value || !userStore.currentUser) return false;
   
   const isAssignee = task.value.assignees.includes(userStore.currentUser.id);
-  const isCreator = task.value.creatorId === userStore.currentUser.id;
+  const isCreator = task.value.creatorid === userStore.currentUser.id;
   const isManager = userStore.isManager;
   
   return isAssignee || isCreator || isManager;
@@ -181,7 +181,7 @@ function addComment() {
   
   tasksStore.addComment(task.value.id, {
     taskId: task.value.id,
-    authorId: userStore.currentUser.id,
+    authorid: userStore.currentUser.id,
     text: newComment.value
   });
   
@@ -197,7 +197,7 @@ function deleteTask() {
 
 function goBack() {
   if (task.value) {
-    router.push(`/project/${task.value.projectId}`);
+    router.push(`/project/${task.value.projectid}`);
   } else {
     router.push('/');
   }

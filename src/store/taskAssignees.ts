@@ -3,7 +3,7 @@ import * as taskAssigneesApi from '../api/taskAssigneesApi';
 
 export const useTaskAssigneesStore = defineStore('taskAssignees', {
   state: () => ({
-    assignees: {} as Record<string, string[]>, // taskid -> userId[]
+    assignees: {} as Record<string, string[]>, // taskid -> userid[]
     loading: false,
     error: null as string | null
   }),
@@ -19,12 +19,12 @@ export const useTaskAssigneesStore = defineStore('taskAssignees', {
         this.loading = false;
       }
     },
-    async addAssignee(taskid: string, userId: string) {
-      await taskAssigneesApi.addAssignee(taskid, userId);
+    async addAssignee(taskid: string, userid: string) {
+      await taskAssigneesApi.addAssignee(taskid, userid);
       await this.fetchAssignees(taskid);
     },
-    async removeAssignee(taskid: string, userId: string) {
-      await taskAssigneesApi.removeAssignee(taskid, userId);
+    async removeAssignee(taskid: string, userid: string) {
+      await taskAssigneesApi.removeAssignee(taskid, userid);
       await this.fetchAssignees(taskid);
     }
   }

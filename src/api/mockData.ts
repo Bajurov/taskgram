@@ -16,8 +16,8 @@ export const tasks: Task[] = [
     title: 'Сделать сайт',
     description: 'Сделать сайт для клиента А',
     deadline: '2024-07-01',
-    projectId: 'p1',
-    creatorId: '699759380',
+    projectid: 'p1',
+    creatorid: '699759380',
     assignees: [],
     status: 'new',
     comments: []
@@ -27,17 +27,17 @@ export const tasks: Task[] = [
     title: 'Настроить рекламу',
     description: 'Настроить таргетированную рекламу для клиента А',
     deadline: '2024-07-15',
-    projectId: 'p1',
-    creatorId: '2',
+    projectid: 'p1',
+    creatorid: '2',
     assignees: ['3'],
     status: 'in_progress',
     comments: [
       {
         id: 'c1',
-        taskId: 't2',
-        authorId: '3',
+        taskid: 't2',
+        authorid: '3',
         text: 'Начал работу над рекламой',
-        createdAt: '2024-06-01'
+        createdat: '2024-06-01'
       }
     ]
   }

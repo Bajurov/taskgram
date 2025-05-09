@@ -106,8 +106,8 @@ async function create() {
       creatorid: userStore.currentUser!.id,
       status: 'new'
     });
-    for (const userId of selectedAssignees.value) {
-      await taskAssigneesStore.addAssignee(taskid, userId);
+    for (const userid of selectedAssignees.value) {
+      await taskAssigneesStore.addAssignee(taskid, userid);
     }
     title.value = '';
     description.value = '';

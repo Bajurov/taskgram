@@ -9,11 +9,11 @@ export const useTasksStore = defineStore('tasks', {
     error: null as string | null
   }),
   getters: {
-    getTasksByProject: (state) => (projectId: string) => 
-      state.tasks.filter(t => t.projectId === projectId),
+    getTasksByProject: (state) => (projectid: string) => 
+      state.tasks.filter(t => t.projectid === projectid),
     
-    getTasksByAssignee: (state) => (userId: string) =>
-      state.tasks.filter(t => t.assignees.includes(userId))
+    getTasksByAssignee: (state) => (userid: string) =>
+      state.tasks.filter(t => t.assignees.includes(userid))
   },
   actions: {
     async fetchTasks() {
@@ -39,15 +39,15 @@ export const useTasksStore = defineStore('tasks', {
       await tasksApi.deleteTask(id);
       await this.fetchTasks();
     },
-    changeTaskStatus(taskId: string, status: 'new' | 'in_progress' | 'done' | 'backlog') {
-      const task = this.tasks.find(t => t.id === taskId);
+    changeTaskStatus(taskid: string, status: 'new' | 'in_progress' | 'done' | 'backlog') {
+      const task = this.tasks.find(t => t.id === taskid);
       if (task) {
         task.status = status;
         this.updateTask(task);
       }
     },
-    addComment(taskId: string, comment: Omit<Comment, 'id' | 'createdAt'>) {
-      const task = this.tasks.find(t => t.id === taskId);
+    addComment(taskid: string, comment: Omit<Comment, 'id' | 'createdAt'>) {
+      const task = this.tasks.find(t => t.id === taskid);
       if (task) {
         task.comments.push({
           ...comment,
@@ -56,16 +56,16 @@ export const useTasksStore = defineStore('tasks', {
         });
       }
     },
-    addAssignee(taskId: string, userId: string) {
-      const task = this.tasks.find(t => t.id === taskId);
-      if (task && !task.assignees.includes(userId) && task.assignees.length < 3) {
-        task.assignees.push(userId);
+    addAssignee(taskid: string, userid: string) {
+      const task = this.tasks.find(t => t.id === taskid);
+      if (task && !task.assignees.includes(userid) && task.assignees.length < 3) {
+        task.assignees.push(userid);
       }
     },
-    removeAssignee(taskId: string, userId: string) {
-      const task = this.tasks.find(t => t.id === taskId);
+    removeAssignee(taskid: string, userid: string) {
+      const task = this.tasks.find(t => t.id === taskid);
       if (task) {
-        task.assignees = task.assignees.filter(id => id !== userId);
+        task.assignees = task.assignees.filter(id => id !== userid);
       }
     }
   }
