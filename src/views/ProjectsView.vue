@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useProjectsStore } from '../store/projects';
 import { useUserStore } from '../store/user';
@@ -60,6 +60,10 @@ import { useUserStore } from '../store/user';
 const router = useRouter();
 const projectsStore = useProjectsStore();
 const userStore = useUserStore();
+
+onMounted(() => {
+  projectsStore.fetchProjects();
+});
 
 const activeTab = ref('active');
 const showAddForm = ref(false);

@@ -1,21 +1,13 @@
 import { defineStore } from 'pinia';
 import { User } from '../types';
-import { users as defaultUsers } from '../api/mockData';
-
-function loadUsers(): User[] {
-  const saved = localStorage.getItem('users');
-  if (saved) return JSON.parse(saved);
-  return [...defaultUsers];
-}
-
-function saveUsers(users: User[]) {
-  localStorage.setItem('users', JSON.stringify(users));
-}
+import * as usersApi from '../api/usersApi';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
     currentUser: null as User | null,
-    users: loadUsers()
+    users: [] as User[],
+    loading: false as boolean,
+    error: null as string | null
   }),
   getters: {
     isOwner: (state) => state.currentUser?.role === 'owner',
@@ -24,29 +16,47 @@ export const useUserStore = defineStore('user', {
     allowedTelegramIds: (state) => state.users.map(u => u.telegramId)
   },
   actions: {
-    loginByTelegramId(telegramId: string) {
-      this.currentUser = this.users.find(u => u.telegramId === telegramId) || null;
+    async fetchUsers() {
+      this.loading = true;
+      try {
+        this.users = await usersApi.getUsers();
+        this.error = null;
+      } catch (e: any) {
+        this.error = e.message || 'Ошибка загрузки пользователей';
+      } finally {
+        this.loading = false;
+      }
+    },
+    async loginByTelegramId(telegramId: string) {
+      this.loading = true;
+      try {
+        const user = await usersApi.getUserByTelegramId(telegramId);
+        this.currentUser = user;
+        this.error = null;
+      } catch (e: any) {
+        this.currentUser = null;
+        this.error = e.message || 'Нет доступа';
+      } finally {
+        this.loading = false;
+      }
     },
     logout() {
       this.currentUser = null;
     },
-    addUser(user: User) {
-      if (!this.users.find(u => u.telegramId === user.telegramId)) {
-        this.users.push(user);
-        saveUsers(this.users);
-      }
+    async addUser(user: User) {
+      await usersApi.addUser(user);
+      await this.fetchUsers();
     },
-    removeUser(telegramId: string) {
-      this.users = this.users.filter(u => u.telegramId !== telegramId);
-      saveUsers(this.users);
+    async removeUser(telegramId: string) {
+      await usersApi.removeUser(telegramId);
+      await this.fetchUsers();
       if (this.currentUser?.telegramId === telegramId) {
         this.logout();
       }
     },
-    setRole(telegramId: string, role: string) {
-      const user = this.users.find(u => u.telegramId === telegramId);
-      if (user) user.role = role as any;
-      saveUsers(this.users);
+    async setRole(telegramId: string, role: string) {
+      await usersApi.setRole(telegramId, role);
+      await this.fetchUsers();
     }
   }
 }); 

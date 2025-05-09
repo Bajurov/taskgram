@@ -268,6 +268,10 @@ function addAccess() {
 function goBack() {
   router.push('/');
 }
+
+onMounted(() => {
+  tasksStore.fetchTasks();
+});
 </script>
 
 <style scoped>

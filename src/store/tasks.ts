@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia';
 import { Task, Comment } from '../types';
-import { tasks } from '../api/mockData';
+import * as tasksApi from '../api/tasksApi';
 
 export const useTasksStore = defineStore('tasks', {
   state: () => ({
-    tasks: [...tasks] as Task[]
+    tasks: [] as Task[],
+    loading: false as boolean,
+    error: null as string | null
   }),
   getters: {
     getTasksByProject: (state) => (projectId: string) => 
@@ -14,22 +16,35 @@ export const useTasksStore = defineStore('tasks', {
       state.tasks.filter(t => t.assignees.includes(userId))
   },
   actions: {
-    addTask(task: Task) {
-      this.tasks.push({
-        ...task,
-        comments: []
-      });
+    async fetchTasks() {
+      this.loading = true;
+      try {
+        this.tasks = await tasksApi.getTasks();
+        this.error = null;
+      } catch (e: any) {
+        this.error = e.message || 'Ошибка загрузки задач';
+      } finally {
+        this.loading = false;
+      }
     },
-    updateTask(task: Task) {
-      const idx = this.tasks.findIndex(t => t.id === task.id);
-      if (idx !== -1) this.tasks[idx] = task;
+    async addTask(task: Task) {
+      await tasksApi.addTask(task);
+      await this.fetchTasks();
     },
-    deleteTask(id: string) {
-      this.tasks = this.tasks.filter(t => t.id !== id);
+    async updateTask(task: Task) {
+      await tasksApi.updateTask(task);
+      await this.fetchTasks();
+    },
+    async deleteTask(id: string) {
+      await tasksApi.deleteTask(id);
+      await this.fetchTasks();
     },
     changeTaskStatus(taskId: string, status: 'new' | 'in_progress' | 'done' | 'backlog') {
       const task = this.tasks.find(t => t.id === taskId);
-      if (task) task.status = status;
+      if (task) {
+        task.status = status;
+        this.updateTask(task);
+      }
     },
     addComment(taskId: string, comment: Omit<Comment, 'id' | 'createdAt'>) {
       const task = this.tasks.find(t => t.id === taskId);

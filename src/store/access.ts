@@ -1,25 +1,40 @@
 import { defineStore } from 'pinia';
 import { Access } from '../types';
-import { accesses } from '../api/mockData';
+import * as accessesApi from '../api/accessesApi';
 
 export const useAccessStore = defineStore('access', {
   state: () => ({
-    accesses: [...accesses] as Access[]
+    accesses: [] as Access[],
+    loading: false,
+    error: null as string | null
   }),
   getters: {
     getAccessesByProject: (state) => (projectId: string) => 
       state.accesses.filter(a => a.projectId === projectId)
   },
   actions: {
-    addAccess(access: Access) {
-      this.accesses.push(access);
+    async fetchAccesses(projectId: string) {
+      this.loading = true;
+      try {
+        this.accesses = await accessesApi.getAccesses(projectId);
+        this.error = null;
+      } catch (e: any) {
+        this.error = e.message || 'Ошибка загрузки доступов';
+      } finally {
+        this.loading = false;
+      }
     },
-    updateAccess(access: Access) {
-      const idx = this.accesses.findIndex(a => a.id === access.id);
-      if (idx !== -1) this.accesses[idx] = access;
+    async addAccess(access: Access) {
+      await accessesApi.addAccess(access);
+      await this.fetchAccesses(access.projectId);
     },
-    deleteAccess(id: string) {
-      this.accesses = this.accesses.filter(a => a.id !== id);
+    async updateAccess(access: Access) {
+      await accessesApi.updateAccess(access);
+      await this.fetchAccesses(access.projectId);
+    },
+    async deleteAccess(id: string, projectId: string) {
+      await accessesApi.deleteAccess(id);
+      await this.fetchAccesses(projectId);
     }
   }
 }); 

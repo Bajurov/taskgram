@@ -1,30 +1,50 @@
 import { defineStore } from 'pinia';
 import { Project } from '../types';
-import { projects } from '../api/mockData';
+import * as projectsApi from '../api/projectsApi';
 
 export const useProjectsStore = defineStore('projects', {
   state: () => ({
-    projects: [...projects] as Project[]
+    projects: [] as Project[],
+    loading: false as boolean,
+    error: null as string | null
   }),
   getters: {
     activeProjects: (state) => state.projects.filter(p => p.status === 'active'),
     archivedProjects: (state) => state.projects.filter(p => p.status === 'archived')
   },
   actions: {
-    addProject(project: Project) {
-      this.projects.push(project);
+    async fetchProjects() {
+      this.loading = true;
+      try {
+        this.projects = await projectsApi.getProjects();
+        this.error = null;
+      } catch (e: any) {
+        this.error = e.message || 'Ошибка загрузки проектов';
+      } finally {
+        this.loading = false;
+      }
     },
-    updateProject(project: Project) {
-      const idx = this.projects.findIndex(p => p.id === project.id);
-      if (idx !== -1) this.projects[idx] = project;
+    async addProject(project: Project) {
+      await projectsApi.addProject(project);
+      await this.fetchProjects();
     },
-    archiveProject(id: string) {
+    async updateProject(project: Project) {
+      await projectsApi.updateProject(project);
+      await this.fetchProjects();
+    },
+    async archiveProject(id: string) {
       const project = this.projects.find(p => p.id === id);
-      if (project) project.status = 'archived';
+      if (project) {
+        project.status = 'archived';
+        await this.updateProject(project);
+      }
     },
-    activateProject(id: string) {
+    async activateProject(id: string) {
       const project = this.projects.find(p => p.id === id);
-      if (project) project.status = 'active';
+      if (project) {
+        project.status = 'active';
+        await this.updateProject(project);
+      }
     }
   }
 }); 
