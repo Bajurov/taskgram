@@ -25,17 +25,18 @@ app.use(createPinia());
 // Подключаем маршрутизацию
 app.use(router);
 
-// Инициализация Telegram Mini Apps и авторизация по Telegram ID
+// Инициализация Telegram Mini Apps и асинхронная авторизация по Telegram ID
 if (window.Telegram?.WebApp) {
   window.Telegram.WebApp.expand();
   const telegramUser = window.Telegram.WebApp.initDataUnsafe?.user;
   if (telegramUser) {
     const userStore = useUserStore();
-    userStore.loginByTelegramId(String(telegramUser.id));
-    if (!userStore.currentUser) {
-      // Если пользователь не найден в списке разрешённых, разлогиниваем
-      router.replace('/login');
-    }
+    (async () => {
+      await userStore.loginByTelegramId(String(telegramUser.id));
+      if (!userStore.currentUser) {
+        router.replace('/login');
+      }
+    })();
   }
 }
 

@@ -17,10 +17,12 @@
 
 <script setup lang="ts">
 import { useUserStore } from '../store/user';
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { supabase } from '../api/supabaseClient';
 
 const userStore = useUserStore();
+const router = useRouter();
 const isDenied = computed(() => !userStore.currentUser);
 
 const debug = ref({
@@ -41,6 +43,15 @@ onMounted(async () => {
     debug.value.supabaseError = error ? JSON.stringify(error, null, 2) : '';
   }
 });
+
+watch(
+  () => userStore.currentUser,
+  (user) => {
+    if (user) {
+      router.push('/');
+    }
+  }
+);
 </script>
 
 <style scoped>
