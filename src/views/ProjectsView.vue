@@ -56,19 +56,23 @@
         style="pointer-events: auto; z-index: 1;"
         @click="handleProjectClick(project.id)"
       >
-        <div class="project-title">{{ project.title }}</div>
+        <div class="project-row-table">
+          <div class="project-row-cell project-title-cell">{{ project.title }}</div>
+          <div class="project-row-cell project-delete-cell">
+            <button
+              v-if="activeTab === 'archived' && userStore.isManager"
+              class="delete-project-btn"
+              @click.stop="confirmDeleteProject(project.id, project.title)"
+              title="Удалить проект"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="12" fill="#ff6b6b"/>
+                <path d="M8 12h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
         <div class="project-description">{{ project.description }}</div>
-        <button
-          v-if="activeTab === 'archived' && userStore.isManager"
-          class="delete-project-btn"
-          @click.stop="confirmDeleteProject(project.id, project.title)"
-          title="Удалить проект"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="12" fill="#ff6b6b"/>
-            <path d="M8 12h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
       </div>
     </div>
     <div v-else class="empty-message">
@@ -307,14 +311,26 @@ textarea {
   transform: translateY(-2px);
 }
 
-.project-title {
+.project-row-table {
+  display: table;
+  width: 100%;
+  margin-bottom: 6px;
+}
+.project-row-cell {
+  display: table-cell;
+  vertical-align: middle;
+}
+.project-title-cell {
+  width: 85%;
   font-weight: 800;
   font-size: 1.15rem;
   color: #eaffd0;
   text-shadow: 0 2px 8px #0a1a0e44, 0 0 2px #000;
-  margin-bottom: 10px;
 }
-
+.project-delete-cell {
+  width: 15%;
+  text-align: right;
+}
 .project-description {
   color: #b6ffb0;
   font-size: 0.98rem;
@@ -337,9 +353,8 @@ textarea {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin-top: 8px;
-  margin-left: 8px;
   transition: background 0.2s;
+  margin: 0;
 }
 .delete-project-btn:hover {
   background: #ff6b6b33;
