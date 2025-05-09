@@ -45,6 +45,10 @@ export const useProjectsStore = defineStore('projects', {
         project.status = 'active';
         await this.updateProject(project);
       }
+    },
+    async deleteProject(id: string) {
+      await projectsApi.deleteProject(id);
+      await this.fetchProjects();
     }
   }
 }); 

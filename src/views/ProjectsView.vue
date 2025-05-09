@@ -58,10 +58,31 @@
       >
         <div class="project-title">{{ project.title }}</div>
         <div class="project-description">{{ project.description }}</div>
+        <button
+          v-if="activeTab === 'archived' && userStore.isManager"
+          class="delete-project-btn"
+          @click.stop="confirmDeleteProject(project.id, project.title)"
+          title="Удалить проект"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="12" fill="#ff6b6b"/>
+            <path d="M8 12h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
       </div>
     </div>
     <div v-else class="empty-message">
       Нет {{ activeTab === 'active' ? 'активных' : 'архивных' }} проектов
+    </div>
+    <div v-if="showDeletePopup" class="delete-popup-overlay">
+      <div class="delete-popup">
+        <div class="delete-popup-title">Удалить проект?</div>
+        <div class="delete-popup-desc">Вы уверены, что хотите безвозвратно удалить проект <b>{{ deleteProjectName }}</b>? Это действие нельзя отменить.</div>
+        <div class="delete-popup-actions">
+          <button @click="deleteProjectConfirmed" class="delete-confirm-btn">Удалить</button>
+          <button @click="showDeletePopup = false" class="delete-cancel-btn">Отмена</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -86,6 +107,10 @@ const newProject = ref({
   title: '',
   description: ''
 });
+
+const showDeletePopup = ref(false);
+const deleteProjectId = ref('');
+const deleteProjectName = ref('');
 
 const filteredProjects = computed(() => {
   return activeTab.value === 'active'
@@ -121,6 +146,19 @@ function addProject() {
 function handleProjectClick(id: string) {
   console.log('Project card clicked:', id);
   navigateToProject(id);
+}
+
+function confirmDeleteProject(id: string, name: string) {
+  deleteProjectId.value = id;
+  deleteProjectName.value = name;
+  showDeletePopup.value = true;
+}
+
+async function deleteProjectConfirmed() {
+  await projectsStore.deleteProject(deleteProjectId.value);
+  showDeletePopup.value = false;
+  deleteProjectId.value = '';
+  deleteProjectName.value = '';
 }
 </script>
 
@@ -286,5 +324,86 @@ textarea {
   text-align: center;
   color: #b6ffb0aa;
   padding: 30px;
+}
+
+.delete-project-btn {
+  background: none;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-top: 8px;
+  margin-left: 8px;
+  transition: background 0.2s;
+}
+.delete-project-btn:hover {
+  background: #ff6b6b33;
+}
+.delete-popup-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.delete-popup {
+  background: #23282d;
+  border-radius: 14px;
+  padding: 32px 28px 24px 28px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+  max-width: 400px;
+  color: #f5f6fa;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.delete-popup-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ff6b6b;
+}
+.delete-popup-desc {
+  font-size: 1.05rem;
+  color: #eaffd0;
+}
+.delete-popup-actions {
+  display: flex;
+  gap: 18px;
+  justify-content: flex-end;
+}
+.delete-confirm-btn {
+  background: #ff6b6b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.delete-confirm-btn:hover {
+  background: #e53935;
+}
+.delete-cancel-btn {
+  background: #2e4e3f;
+  color: #b6ffb0;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.delete-cancel-btn:hover {
+  background: #3a6650;
 }
 </style> 

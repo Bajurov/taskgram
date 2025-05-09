@@ -3,15 +3,15 @@ import * as taskAssigneesApi from '../api/taskAssigneesApi';
 
 export const useTaskAssigneesStore = defineStore('taskAssignees', {
   state: () => ({
-    assignees: {} as Record<string, string[]>, // taskId -> userId[]
+    assignees: {} as Record<string, string[]>, // taskid -> userId[]
     loading: false,
     error: null as string | null
   }),
   actions: {
-    async fetchAssignees(taskId: string) {
+    async fetchAssignees(taskid: string) {
       this.loading = true;
       try {
-        this.assignees[taskId] = await taskAssigneesApi.getAssignees(taskId);
+        this.assignees[taskid] = await taskAssigneesApi.getAssignees(taskid);
         this.error = null;
       } catch (e: any) {
         this.error = e.message || 'Ошибка загрузки исполнителей';
@@ -19,13 +19,13 @@ export const useTaskAssigneesStore = defineStore('taskAssignees', {
         this.loading = false;
       }
     },
-    async addAssignee(taskId: string, userId: string) {
-      await taskAssigneesApi.addAssignee(taskId, userId);
-      await this.fetchAssignees(taskId);
+    async addAssignee(taskid: string, userId: string) {
+      await taskAssigneesApi.addAssignee(taskid, userId);
+      await this.fetchAssignees(taskid);
     },
-    async removeAssignee(taskId: string, userId: string) {
-      await taskAssigneesApi.removeAssignee(taskId, userId);
-      await this.fetchAssignees(taskId);
+    async removeAssignee(taskid: string, userId: string) {
+      await taskAssigneesApi.removeAssignee(taskid, userId);
+      await this.fetchAssignees(taskid);
     }
   }
 }); 

@@ -70,6 +70,7 @@ async function create() {
       comment: comment.value,
       projectid: props.projectid
     });
+    await new Promise(r => setTimeout(r, 400));
     await accessStore.fetchAccesses(props.projectid);
     
     url.value = '';

@@ -96,9 +96,9 @@ async function create() {
   }
   try {
     loading.value = true;
-    const taskId = uuidv4();
+    const taskid = uuidv4();
     await tasksStore.addTask({
-      id: taskId,
+      id: taskid,
       title: title.value,
       description: description.value,
       deadline: deadline.value,
@@ -107,7 +107,7 @@ async function create() {
       status: 'new'
     });
     for (const userId of selectedAssignees.value) {
-      await taskAssigneesStore.addAssignee(taskId, userId);
+      await taskAssigneesStore.addAssignee(taskid, userId);
     }
     title.value = '';
     description.value = '';
