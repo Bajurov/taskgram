@@ -1,7 +1,7 @@
 <template>
   <div class="user-admin">
     <h2>Управление пользователями</h2>
-    <form @submit.prevent="addUser">
+    <form @submit.prevent="addUser" v-if="userStore.isManager">
       <input v-model="newUserId" placeholder="Telegram ID" required />
       <input v-model="newUserName" placeholder="Имя" required />
       <select v-model="newUserRole">
@@ -13,7 +13,7 @@
     <div v-if="formError" class="form-error">{{ formError }}</div>
     <div v-if="notifyMsg" class="notify">{{ notifyMsg }}</div>
     <Spinner v-if="usersLoading || loading" />
-    <table v-else>
+    <table v-else-if="userStore.isManager">
       <thead>
         <tr>
           <th>Telegram ID</th>
@@ -27,7 +27,7 @@
           <td>{{ user.telegramId }}</td>
           <td>{{ user.name }}</td>
           <td>
-            <select v-model="user.role" @change="changeRole(user)" :disabled="loading">
+            <select v-model="user.role" @change="changeRole(user)" :disabled="loading || user.role === 'owner'">
               <option value="owner">Владелец</option>
               <option value="manager">Руководитель</option>
               <option value="employee">Сотрудник</option>
@@ -39,6 +39,9 @@
         </tr>
       </tbody>
     </table>
+    <div v-else class="no-access">
+      У вас нет доступа к управлению пользователями
+    </div>
     <button @click="$emit('close')" :disabled="loading">Закрыть</button>
   </div>
 </template>
@@ -204,6 +207,10 @@ button[disabled] {
   border: 1px solid #c8e6c9;
   padding: 8px;
   border-radius: 4px;
+  margin-bottom: 10px;
+}
+.no-access {
+  color: #ff6b6b;
   margin-bottom: 10px;
 }
 </style> 

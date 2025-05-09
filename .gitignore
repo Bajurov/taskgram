@@ -7,4 +7,6 @@ yarn-debug.log
 yarn-error.log
 .idea
 .vscode
-*.local 
+*.local
+chat_logger.py
+chat_logs/ 
