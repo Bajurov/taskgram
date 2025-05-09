@@ -7,7 +7,9 @@
       </div>
       <h2>{{ task.title }}</h2>
     </div>
-    
+    <!-- ВРЕМЕННО для отладки -->
+    <pre style="background:#f8f8f8; color:#333; padding:8px; border-radius:4px; font-size:12px;">{{ task }}</pre>
+    <!-- /ВРЕМЕННО -->
     <div class="task-meta">
       <div class="meta-item">
         <strong>Проект:</strong> {{ projectName }}
@@ -50,14 +52,19 @@
       
       <div v-if="canEdit" class="delete-action">
         <button class="delete-button" @click="confirmDelete = true">
-          Удалить задачу
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="12" fill="#ffd6d6"/>
+            <path d="M8 8l8 8M16 8l-8 8" stroke="#d32f2f" stroke-width="2" stroke-linecap="round"/>
+          </svg>
         </button>
         
-        <div v-if="confirmDelete" class="confirm-delete">
-          <p>Вы уверены, что хотите удалить задачу?</p>
-          <div class="confirm-buttons">
-            <button @click="deleteTask">Да, удалить</button>
-            <button @click="confirmDelete = false">Отмена</button>
+        <div v-if="confirmDelete" class="custom-confirm-popup">
+          <div class="popup-content">
+            <p>Вы уверены, что хотите удалить задачу?</p>
+            <div class="popup-buttons">
+              <button class="confirm-btn" @click="deleteTask">Удалить</button>
+              <button class="cancel-btn" @click="confirmDelete = false">Отмена</button>
+            </div>
           </div>
         </div>
       </div>
