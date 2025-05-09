@@ -58,6 +58,9 @@
       >
         <div class="project-title">{{ project.title }}</div>
         <div class="project-description">{{ project.description }}</div>
+        <div v-if="debugProjectId === project.id" class="debug-info">
+          <strong>DEBUG:</strong> Клик по проекту (id: {{ project.id }})
+        </div>
       </div>
     </div>
     <div v-else class="empty-message">
@@ -93,6 +96,8 @@ const filteredProjects = computed(() => {
     : projectsStore.archivedProjects;
 });
 
+const debugProjectId = ref<string | null>(null);
+
 function navigateToProject(id: string) {
   router.push(`/project/${id}`);
 }
@@ -113,6 +118,10 @@ function addProject() {
 }
 
 function handleProjectClick(id: string) {
+  debugProjectId.value = id;
+  setTimeout(() => {
+    debugProjectId.value = null;
+  }, 2000);
   console.log('Project card clicked:', id);
   navigateToProject(id);
 }
@@ -271,5 +280,11 @@ textarea {
   text-align: center;
   color: #b6ffb0aa;
   padding: 30px;
+}
+
+.debug-info {
+  color: #ff6b6b;
+  margin-top: 10px;
+  font-size: 0.95rem;
 }
 </style> 
