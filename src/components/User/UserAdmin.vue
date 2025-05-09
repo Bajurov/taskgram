@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useUserStore } from '../../store/user';
 import Spinner from './Spinner.vue';
 
@@ -60,13 +60,22 @@ const notifyMsg = ref('');
 const loading = ref(false);
 const usersLoading = ref(true);
 
+// Используем computed для реактивного получения списка пользователей
+const users = computed(() => userStore.users);
+
 onMounted(async () => {
   usersLoading.value = true;
-  await userStore.fetchUsers();
-  usersLoading.value = false;
+  try {
+    await userStore.fetchUsers();
+    console.log('Current user:', userStore.currentUser);
+    console.log('Users loaded:', userStore.users);
+  } catch (error) {
+    console.error('Error loading users:', error);
+    formError.value = 'Ошибка загрузки пользователей: ' + (error?.message || error);
+  } finally {
+    usersLoading.value = false;
+  }
 });
-
-const users = userStore.users;
 
 async function addUser() {
   formError.value = '';

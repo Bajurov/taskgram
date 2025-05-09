@@ -1,40 +1,102 @@
 import { defineStore } from 'pinia';
-import { Access } from '../types';
-import * as accessesApi from '../api/accessesApi';
+import { supabase } from '../supabaseClient';
+
+interface Access {
+  id: string;
+  url: string;
+  login: string;
+  password: string;
+  comment?: string;
+  projectId: string;
+}
 
 export const useAccessStore = defineStore('access', {
   state: () => ({
     accesses: [] as Access[],
     loading: false,
-    error: null as string | null
+    error: null as string | null,
   }),
-  getters: {
-    getAccessesByProject: (state) => (projectId: string) => 
-      state.accesses.filter(a => a.projectId === projectId)
-  },
+
   actions: {
     async fetchAccesses(projectId: string) {
       this.loading = true;
+      this.error = null;
       try {
-        this.accesses = await accessesApi.getAccesses(projectId);
-        this.error = null;
-      } catch (e: any) {
-        this.error = e.message || 'Ошибка загрузки доступов';
+        const { data, error } = await supabase
+          .from('accesses')
+          .select('*')
+          .eq('projectId', projectId);
+
+        if (error) throw error;
+        this.accesses = data || [];
+      } catch (e) {
+        this.error = e?.message || 'Failed to fetch accesses';
+        console.error('Error fetching accesses:', e);
       } finally {
         this.loading = false;
       }
     },
+
     async addAccess(access: Access) {
-      await accessesApi.addAccess(access);
-      await this.fetchAccesses(access.projectId);
+      this.loading = true;
+      this.error = null;
+      try {
+        const { error } = await supabase
+          .from('accesses')
+          .insert([access]);
+
+        if (error) throw error;
+        this.accesses.push(access);
+      } catch (e) {
+        this.error = e?.message || 'Failed to add access';
+        console.error('Error adding access:', e);
+        throw e;
+      } finally {
+        this.loading = false;
+      }
     },
+
+    async removeAccess(id: string) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const { error } = await supabase
+          .from('accesses')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+        this.accesses = this.accesses.filter(access => access.id !== id);
+      } catch (e) {
+        this.error = e?.message || 'Failed to remove access';
+        console.error('Error removing access:', e);
+        throw e;
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async updateAccess(access: Access) {
-      await accessesApi.updateAccess(access);
-      await this.fetchAccesses(access.projectId);
+      this.loading = true;
+      this.error = null;
+      try {
+        const { error } = await supabase
+          .from('accesses')
+          .update(access)
+          .eq('id', access.id);
+
+        if (error) throw error;
+        const index = this.accesses.findIndex(a => a.id === access.id);
+        if (index !== -1) {
+          this.accesses[index] = access;
+        }
+      } catch (e) {
+        this.error = e?.message || 'Failed to update access';
+        console.error('Error updating access:', e);
+        throw e;
+      } finally {
+        this.loading = false;
+      }
     },
-    async deleteAccess(id: string, projectId: string) {
-      await accessesApi.deleteAccess(id);
-      await this.fetchAccesses(projectId);
-    }
-  }
+  },
 }); 

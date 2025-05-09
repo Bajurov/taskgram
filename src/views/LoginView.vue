@@ -38,9 +38,15 @@ onMounted(async () => {
   }
   debug.value.telegramId = telegramId;
   if (telegramId) {
-    const { data, error } = await supabase.from('users').select('*').eq('telegramId', telegramId).single();
-    debug.value.supabaseUser = JSON.stringify(data, null, 2);
-    debug.value.supabaseError = error ? JSON.stringify(error, null, 2) : '';
+    try {
+      await userStore.loginByTelegramId(telegramId);
+      const { data, error } = await supabase.from('users').select('*').eq('telegramId', telegramId).single();
+      debug.value.supabaseUser = JSON.stringify(data, null, 2);
+      debug.value.supabaseError = error ? JSON.stringify(error, null, 2) : '';
+    } catch (error) {
+      console.error('Login error:', error);
+      debug.value.supabaseError = error ? JSON.stringify(error, null, 2) : '';
+    }
   }
 });
 

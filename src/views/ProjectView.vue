@@ -28,35 +28,11 @@
           </button>
         </div>
         
-        <div v-if="showTaskForm" class="add-task-form">
-          <div class="form-group">
-            <label for="task-title">Название</label>
-            <input type="text" id="task-title" v-model="newTask.title" placeholder="Название задачи">
-          </div>
-          <div class="form-group">
-            <label for="task-description">Описание</label>
-            <textarea id="task-description" v-model="newTask.description" placeholder="Описание задачи"></textarea>
-          </div>
-          <div class="form-group">
-            <label for="task-deadline">Дедлайн</label>
-            <input type="date" id="task-deadline" v-model="newTask.deadline">
-          </div>
-          <div class="form-group">
-            <label>Исполнители</label>
-            <div class="assignees-selection">
-              <div 
-                v-for="user in employees" 
-                :key="user.id"
-                class="assignee-option"
-                :class="{ selected: selectedAssignees.includes(user.id) }"
-                @click="toggleAssignee(user.id)"
-              >
-                {{ user.name }}
-              </div>
-            </div>
-          </div>
-          <button @click="addTask">Создать задачу</button>
-        </div>
+        <TaskForm 
+          v-if="showTaskForm" 
+          :projectId="route.params.id as string"
+          @task-added="showTaskForm = false"
+        />
         
         <div class="tasks-list">
           <div v-if="filteredTasks.length === 0" class="empty-message">
@@ -87,41 +63,13 @@
           </button>
         </div>
         
-        <div v-if="showAccessForm" class="add-access-form">
-          <div class="form-group">
-            <label for="url">URL</label>
-            <input type="text" id="url" v-model="newAccess.url" placeholder="URL сервиса">
-          </div>
-          <div class="form-group">
-            <label for="login">Логин</label>
-            <input type="text" id="login" v-model="newAccess.login" placeholder="Логин">
-          </div>
-          <div class="form-group">
-            <label for="password">Пароль</label>
-            <input type="text" id="password" v-model="newAccess.password" placeholder="Пароль">
-          </div>
-          <div class="form-group">
-            <label for="comment">Комментарий</label>
-            <textarea id="comment" v-model="newAccess.comment" placeholder="Комментарий"></textarea>
-          </div>
-          <button @click="addAccess">Добавить доступ</button>
-        </div>
+        <AccessForm 
+          v-if="showAccessForm" 
+          :projectId="route.params.id as string"
+          @access-added="showAccessForm = false"
+        />
         
-        <div class="accesses-list">
-          <div v-if="projectAccesses.length === 0" class="empty-message">
-            Нет доступов
-          </div>
-          <div v-for="access in projectAccesses" :key="access.id" class="access-card">
-            <div class="access-url">{{ access.url }}</div>
-            <div class="access-credentials">
-              <div><strong>Логин:</strong> {{ access.login }}</div>
-              <div><strong>Пароль:</strong> {{ access.password }}</div>
-            </div>
-            <div class="access-comment" v-if="access.comment">
-              {{ access.comment }}
-            </div>
-          </div>
-        </div>
+        <AccessList :projectId="route.params.id as string" />
       </div>
     </div>
   </div>
@@ -138,6 +86,9 @@ import { useTasksStore } from '../store/tasks';
 import { useAccessStore } from '../store/access';
 import { useUserStore } from '../store/user';
 import { users } from '../api/mockData';
+import AccessForm from '../components/Access/AccessForm.vue';
+import AccessList from '../components/Access/AccessList.vue';
+import TaskForm from '../components/Task/TaskForm.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -276,203 +227,211 @@ onMounted(() => {
 
 <style scoped>
 .project-view {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 20px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #b6ffb0;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 8px 0;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s;
+}
+
+.back-btn:hover {
+  color: #fff;
 }
 
 .project-header {
   display: flex;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 15px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
-.project-description {
-  margin-bottom: 20px;
-  color: #555;
-}
-
-.action-buttons {
-  margin-bottom: 30px;
+.project-header h2 {
+  color: #f5f6fa;
+  margin: 0;
+  font-size: 1.8rem;
 }
 
 .status-badge {
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .status-badge.active {
-  background-color: #28a745;
-  color: white;
+  background: rgba(182, 255, 176, 0.2);
+  color: #b6ffb0;
 }
 
 .status-badge.archived {
-  background-color: #6c757d;
-  color: white;
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+}
+
+.project-description {
+  color: #888;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.action-buttons button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-buttons button:first-child {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+}
+
+.action-buttons button:last-child {
+  background: rgba(182, 255, 176, 0.2);
+  color: #b6ffb0;
+}
+
+.action-buttons button:hover {
+  transform: translateY(-1px);
 }
 
 .project-content {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 30px;
+  gap: 32px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .project-content {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+.tasks-section,
+.accesses-section {
+  background: #23282d;
+  border-radius: 12px;
+  padding: 24px;
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
-.add-task-form, .add-access-form {
-  background-color: white;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+.section-header h3 {
+  color: #b6ffb0;
+  margin: 0;
+  font-size: 1.3rem;
 }
 
-.form-group {
-  margin-bottom: 15px;
+.section-header button {
+  padding: 8px 16px;
+  background: #2e4e3f;
+  color: #b6ffb0;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
+.section-header button:hover {
+  background: #3a6650;
+  transform: translateY(-1px);
 }
 
-input, textarea {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.tasks-list, .accesses-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.task-card, .access-card {
-  background-color: white;
-  border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+.tasks-list {
+  display: grid;
+  gap: 16px;
 }
 
 .task-card {
+  background: #181c1f;
+  border-radius: 8px;
+  padding: 16px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
+  border: 1px solid transparent;
 }
 
 .task-card:hover {
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  border-color: #2e4e3f;
   transform: translateY(-2px);
 }
 
 .task-status {
   display: inline-block;
-  padding: 3px 8px;
+  padding: 4px 8px;
   border-radius: 4px;
-  font-size: 12px;
-  margin-bottom: 5px;
+  font-size: 0.8rem;
+  margin-bottom: 8px;
 }
 
 .task-status.new {
-  background-color: #17a2b8;
-  color: white;
+  background: rgba(182, 255, 176, 0.2);
+  color: #b6ffb0;
 }
 
 .task-status.in_progress {
-  background-color: #ffc107;
-  color: black;
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
 }
 
 .task-status.done {
-  background-color: #28a745;
-  color: white;
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
 }
 
 .task-status.backlog {
-  background-color: #6c757d;
-  color: white;
+  background: rgba(158, 158, 158, 0.2);
+  color: #9e9e9e;
 }
 
 .task-title {
-  font-weight: bold;
-  margin-bottom: 5px;
+  color: #f5f6fa;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
 }
 
-.task-details, .access-credentials {
-  font-size: 14px;
-  color: #555;
-}
-
-.access-url {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.access-comment {
-  margin-top: 5px;
-  font-size: 14px;
-  font-style: italic;
-  color: #666;
-}
-
-.assignees-selection {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 5px;
-}
-
-.assignee-option {
-  padding: 5px 10px;
-  border-radius: 4px;
-  background-color: #f0f0f0;
-  cursor: pointer;
-}
-
-.assignee-option.selected {
-  background-color: #0088cc;
-  color: white;
+.task-details {
+  color: #888;
+  font-size: 0.9rem;
 }
 
 .empty-message {
+  color: #888;
   text-align: center;
-  color: #666;
-  padding: 20px;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
 }
 
 .loading {
+  color: #888;
   text-align: center;
-  padding: 30px;
-  color: #555;
-}
-
-.back-btn {
-  margin-bottom: 15px;
-  background: none;
-  color: #0088cc;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 0;
-  text-align: left;
-}
-
-.back-btn:hover {
-  text-decoration: underline;
+  padding: 40px;
 }
 </style> 
