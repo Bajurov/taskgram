@@ -3,7 +3,7 @@
     <header v-if="userStore.currentUser" class="app-header">
       <div class="header-left">
         <h1>TASKgram</h1>
-      </div>
+      
       <div class="header-actions">
         <button v-if="userStore.isOwner" class="icon-btn" @click="showUsers = !showUsers" title="Пользователи">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#b6ffb0" stroke-width="2"/><path d="M4 20c0-2.2 3.6-4 8-4s8 1.8 8 4" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round"/></svg>
@@ -11,6 +11,7 @@
         <button class="icon-btn" @click="logout" title="Выйти">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M16 17l5-5-5-5" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12H9" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 19v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v2" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
+      </div>
       </div>
     </header>
     <main>
