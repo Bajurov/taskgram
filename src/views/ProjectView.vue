@@ -1,5 +1,6 @@
 <template>
   <div v-if="project" class="project-view">
+    <button class="back-btn" @click="goBack">← Назад к проектам</button>
     <div class="project-header">
       <h2>{{ project.title }}</h2>
       <div class="status-badge" :class="project.status">
@@ -263,6 +264,10 @@ function addAccess() {
   newAccess.value.comment = '';
   showAccessForm.value = false;
 }
+
+function goBack() {
+  router.push('/');
+}
 </script>
 
 <style scoped>
@@ -450,5 +455,20 @@ input, textarea {
   text-align: center;
   padding: 30px;
   color: #555;
+}
+
+.back-btn {
+  margin-bottom: 15px;
+  background: none;
+  color: #0088cc;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.back-btn:hover {
+  text-decoration: underline;
 }
 </style> 

@@ -1,5 +1,6 @@
 <template>
   <div v-if="task" class="task-container">
+    <button class="back-btn" @click="goBack">← Назад к проекту</button>
     <div class="task-header">
       <div class="task-status" :class="task.status">
         {{ taskStatusLabels[task.status] }}
@@ -192,6 +193,14 @@ function deleteTask() {
   
   tasksStore.deleteTask(task.value.id);
   router.push('/');
+}
+
+function goBack() {
+  if (task.value) {
+    router.push(`/project/${task.value.projectId}`);
+  } else {
+    router.push('/');
+  }
 }
 </script>
 
@@ -407,5 +416,20 @@ function deleteTask() {
   text-align: center;
   padding: 30px;
   color: #555;
+}
+
+.back-btn {
+  margin-bottom: 15px;
+  background: none;
+  color: #0088cc;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.back-btn:hover {
+  text-decoration: underline;
 }
 </style> 

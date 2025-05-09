@@ -71,6 +71,8 @@ button {
   border-radius: 4px;
   padding: 8px 16px;
   cursor: pointer;
+  max-width: 100%;
+  word-break: break-word;
 }
 
 button:hover {
@@ -79,5 +81,23 @@ button:hover {
 
 main {
   padding: 20px;
+}
+
+@media (max-width: 600px) {
+  .app-header, .user-info {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  button, input, select, textarea {
+    width: 100% !important;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+  }
+  .projects-list, .tasks-list, .accesses-list {
+    grid-template-columns: 1fr !important;
+  }
+  main {
+    padding: 5px;
+  }
 }
 </style> 
