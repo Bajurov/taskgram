@@ -60,6 +60,7 @@
         <div class="project-description">{{ project.description }}</div>
         <div v-if="debugProjectId === project.id" class="debug-info">
           <strong>DEBUG:</strong> Клик по проекту (id: {{ project.id }})
+          <div v-if="debugRouterMsg" class="debug-router-msg">{{ debugRouterMsg }}</div>
         </div>
       </div>
     </div>
@@ -97,11 +98,18 @@ const filteredProjects = computed(() => {
 });
 
 const debugProjectId = ref<string | null>(null);
+const debugRouterMsg = ref<string | null>(null);
 
 function navigateToProject(id: string) {
   router.push(`/project/${id}`)
-    .then(() => console.log('router.push resolved'))
-    .catch(e => console.error('router.push error', e));
+    .then(() => {
+      debugRouterMsg.value = 'router.push resolved';
+      console.log('router.push resolved');
+    })
+    .catch(e => {
+      debugRouterMsg.value = 'router.push error: ' + e;
+      console.error('router.push error', e);
+    });
 }
 
 function addProject() {
@@ -121,9 +129,11 @@ function addProject() {
 
 function handleProjectClick(id: string) {
   debugProjectId.value = id;
+  debugRouterMsg.value = null;
   setTimeout(() => {
     debugProjectId.value = null;
-  }, 2000);
+    debugRouterMsg.value = null;
+  }, 10000);
   console.log('Project card clicked:', id);
   navigateToProject(id);
 }
@@ -287,6 +297,12 @@ textarea {
 .debug-info {
   color: #ff6b6b;
   margin-top: 10px;
+  font-size: 0.95rem;
+}
+
+.debug-router-msg {
+  color: #b6ffb0;
+  margin-top: 6px;
   font-size: 0.95rem;
 }
 </style> 
