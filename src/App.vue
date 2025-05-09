@@ -1,17 +1,22 @@
 <template>
   <div class="app-container">
-    <header v-if="userStore.currentUser" class="app-header">
-      <div class="header-left">
-        <h1>TASKgram</h1>
-      
-      <div class="header-actions">
-        <button v-if="userStore.isOwner" class="icon-btn" @click="showUsers = !showUsers" title="Пользователи">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#b6ffb0" stroke-width="2"/><path d="M4 20c0-2.2 3.6-4 8-4s8 1.8 8 4" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round"/></svg>
-        </button>
-        <button class="icon-btn" @click="logout" title="Выйти">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M16 17l5-5-5-5" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12H9" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 19v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v2" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-      </div>
+    <header v-if="userStore.currentUser" class="app-header-table">
+      <div class="header-table">
+        <div class="header-row">
+          <div class="header-cell header-title-cell">
+            <h1>TASKgram</h1>
+          </div>
+          <div class="header-cell header-btn-cell">
+            <button v-if="userStore.isOwner" class="icon-btn" @click="showUsers = !showUsers" title="Пользователи">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#b6ffb0" stroke-width="2"/><path d="M4 20c0-2.2 3.6-4 8-4s8 1.8 8 4" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div class="header-cell header-btn-cell">
+            <button class="icon-btn" @click="logout" title="Выйти">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M16 17l5-5-5-5" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12H9" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 19v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v2" stroke="#b6ffb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
       </div>
     </header>
     <main>
@@ -57,37 +62,47 @@ body {
   background: #181c1f;
 }
 
-.app-header {
+.app-header-table {
   background: linear-gradient(90deg, #1e2a22 0%, #1a3c2b 100%);
   color: #fff;
   padding: 8px 18px 6px 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   box-shadow: 0 2px 12px 0 rgba(0,0,0,0.18);
   border-bottom: 1.5px solid #22332a;
   min-height: 48px;
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.header-table {
+  display: table;
+  width: 100%;
+  height: 100%;
 }
 
-.app-header h1 {
+.header-row {
+  display: table-row;
+}
+
+.header-cell {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.header-title-cell {
+  width: 60%;
+  text-align: left;
+}
+
+.header-btn-cell {
+  width: 20%;
+}
+
+.header-title-cell h1 {
   font-size: 1.25rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   color: #b6ffb0;
   text-shadow: 0 2px 8px #0a1a0e44, 0 0 2px #000;
-  margin-right: 0.5em;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin: 0;
 }
 
 .icon-btn {
@@ -141,7 +156,7 @@ h2, h3, h4, h5 {
 }
 
 @media (max-width: 600px) {
-  .app-header, .header-actions, .header-left {
+  .app-header-table, .header-table, .header-row, .header-cell {
     flex-direction: column !important;
     align-items: stretch !important;
   }
