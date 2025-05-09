@@ -69,6 +69,7 @@ body {
   box-shadow: 0 2px 12px 0 rgba(0,0,0,0.18);
   border-bottom: 1.5px solid #22332a;
   min-height: 48px;
+  height: 60px;
 }
 
 .header-table {
@@ -79,12 +80,14 @@ body {
 
 .header-row {
   display: table-row;
+  height: 100%;
 }
 
 .header-cell {
   display: table-cell;
   vertical-align: middle;
   text-align: center;
+  height: 100%;
 }
 
 .header-title-cell {
@@ -94,6 +97,13 @@ body {
 
 .header-btn-cell {
   width: 20%;
+}
+
+.header-btn-cell .icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .header-title-cell h1 {

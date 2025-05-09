@@ -1,6 +1,6 @@
 <template>
   <div class="access-list">
-    <h2 class="section-title">Доступы к сервисам</h2>
+    <!-- <h2 class="section-title">Доступы к сервисам</h2> -->
     <div v-if="loading" class="loading">
       <Spinner />
     </div>

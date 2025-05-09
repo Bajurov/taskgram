@@ -22,11 +22,15 @@
     <div class="project-content">
       <div class="tasks-section">
         <div class="section-header">
-          <h3>Задачи</h3>
-          <button v-if="userStore.isManager" @click="showTaskForm = !showTaskForm">
-            {{ showTaskForm ? 'Отмена' : 'Добавить задачу' }}
+          <div class="section-title">Задачи</div>
+          <button v-if="userStore.isManager" class="plus-btn" @click="showTaskForm = !showTaskForm" :title="showTaskForm ? 'Отмена' : 'Добавить задачу'">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="12" fill="#b6ffb0"/>
+              <path d="M12 7v10M7 12h10" stroke="#181c1f" stroke-width="2" stroke-linecap="round"/>
+            </svg>
           </button>
         </div>
+        <div class="section-btn-spacer"></div>
         
         <TaskForm 
           v-if="showTaskForm" 
@@ -57,11 +61,15 @@
       
       <div v-if="userStore.isManager" class="accesses-section">
         <div class="section-header">
-          <h3>Доступы</h3>
-          <button @click="showAccessForm = !showAccessForm">
-            {{ showAccessForm ? 'Отмена' : 'Добавить доступ' }}
+          <div class="section-title">Доступы</div>
+          <button class="plus-btn" @click="showAccessForm = !showAccessForm" :title="showAccessForm ? 'Отмена' : 'Добавить доступ'">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="12" fill="#b6ffb0"/>
+              <path d="M12 7v10M7 12h10" stroke="#181c1f" stroke-width="2" stroke-linecap="round"/>
+            </svg>
           </button>
         </div>
+        <div class="section-btn-spacer"></div>
         
         <AccessForm 
           v-if="showAccessForm" 
@@ -182,7 +190,7 @@ function addTask() {
     description: newTask.value.description,
     deadline: newTask.value.deadline,
     projectid: route.params.id as string,
-    creatorId: userStore.currentUser?.id || '',
+    creatorid: userStore.currentUser?.id || '',
     assignees: selectedAssignees.value,
     status: 'new',
     comments: []
@@ -339,29 +347,36 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
-.section-header h3 {
+.section-title {
   color: #b6ffb0;
   margin: 0;
   font-size: 1.3rem;
 }
 
-.section-header button {
-  padding: 8px 16px;
-  background: #2e4e3f;
-  color: #b6ffb0;
+.plus-btn {
+  background: none;
   border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  border-radius: 50%;
+  padding: 0;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s;
+  box-shadow: 0 2px 8px #0a1a0e22;
 }
 
-.section-header button:hover {
-  background: #3a6650;
-  transform: translateY(-1px);
+.plus-btn:hover {
+  background: #2e4e3f;
+}
+
+.section-btn-spacer {
+  height: 18px;
 }
 
 .tasks-list {

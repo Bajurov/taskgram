@@ -103,7 +103,7 @@ async function create() {
       description: description.value,
       deadline: deadline.value,
       projectid: props.projectid,
-      creatorId: userStore.currentUser!.id,
+      creatorid: userStore.currentUser!.id,
       status: 'new'
     });
     for (const userId of selectedAssignees.value) {

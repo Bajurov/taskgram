@@ -70,6 +70,7 @@ async function create() {
       comment: comment.value,
       projectid: props.projectid
     });
+    await accessStore.fetchAccesses(props.projectid);
     
     url.value = '';
     login.value = '';

@@ -1,22 +1,22 @@
 <template>
   <div class="projects-container">
-    <div class="projects-header">
-      <h2>Проекты</h2>
-      <button
-        v-if="userStore.isManager"
-        class="add-project-btn"
-        @click="showAddForm = !showAddForm"
-        :title="showAddForm ? 'Отмена' : 'Добавить проект'"
-      >
-        <svg v-if="!showAddForm" width="28" height="28" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="12" fill="#b6ffb0"/>
-          <path d="M12 7v10M7 12h10" stroke="#181c1f" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <svg v-else width="28" height="28" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="12" fill="#ff6b6b"/>
-          <path d="M7 12h10" stroke="#181c1f" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </button>
+    <div class="projects-header-table">
+      <div class="projects-header-row">
+        <div class="projects-header-cell projects-header-title">Проекты</div>
+        <div class="projects-header-cell projects-header-btn">
+          <button
+            v-if="userStore.isManager"
+            class="add-project-btn"
+            @click="showAddForm = !showAddForm"
+            :title="showAddForm ? 'Отмена' : 'Добавить проект'"
+          >
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="12" fill="#b6ffb0"/>
+              <path d="M12 7v10M7 12h10" stroke="#181c1f" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
 
     <div v-if="showAddForm" class="add-project-form">
@@ -130,21 +130,30 @@ function handleProjectClick(id: string) {
   margin: 0 auto;
 }
 
-.projects-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+.projects-header-table {
+  display: table;
+  width: 100%;
+  margin-bottom: 18px;
 }
-
-.projects-header h2 {
+.projects-header-row {
+  display: table-row;
+}
+.projects-header-cell {
+  display: table-cell;
+  vertical-align: middle;
+}
+.projects-header-title {
+  width: 80%;
+  font-size: 1.35rem;
+  font-weight: 800;
   color: #eaffd0;
   text-shadow: 0 2px 8px #0a1a0e44, 0 0 2px #000;
-  font-weight: 800;
-  font-size: 1.35rem;
-  margin: 0;
+  padding-bottom: 2px;
 }
-
+.projects-header-btn {
+  width: 20%;
+  text-align: right;
+}
 .add-project-btn {
   background: none;
   border: none;
