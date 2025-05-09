@@ -8,9 +8,12 @@
         <option value="manager">Руководитель</option>
         <option value="employee">Сотрудник</option>
       </select>
-      <button type="submit">Добавить</button>
+      <button type="submit" :disabled="loading">Добавить</button>
     </form>
-    <table>
+    <div v-if="formError" class="form-error">{{ formError }}</div>
+    <div v-if="notifyMsg" class="notify">{{ notifyMsg }}</div>
+    <Spinner v-if="usersLoading || loading" />
+    <table v-else>
       <thead>
         <tr>
           <th>Telegram ID</th>
@@ -24,94 +27,183 @@
           <td>{{ user.telegramId }}</td>
           <td>{{ user.name }}</td>
           <td>
-            <select v-model="user.role" @change="changeRole(user)">
+            <select v-model="user.role" @change="changeRole(user)" :disabled="loading">
               <option value="owner">Владелец</option>
               <option value="manager">Руководитель</option>
               <option value="employee">Сотрудник</option>
             </select>
           </td>
           <td>
-            <button @click="removeUser(user.telegramId)" :disabled="user.role==='owner'">Удалить</button>
+            <button @click="removeUser(user.telegramId)" :disabled="user.role==='owner'||loading">Удалить</button>
           </td>
         </tr>
       </tbody>
     </table>
-    <button @click="$emit('close')">Закрыть</button>
+    <button @click="$emit('close')" :disabled="loading">Закрыть</button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useUserStore } from '../../store/user';
+import Spinner from './Spinner.vue';
 
 const userStore = useUserStore();
 const newUserId = ref('');
 const newUserName = ref('');
 const newUserRole = ref('employee');
+const formError = ref('');
+const notifyMsg = ref('');
+const loading = ref(false);
+const usersLoading = ref(true);
+
+onMounted(async () => {
+  usersLoading.value = true;
+  await userStore.fetchUsers();
+  usersLoading.value = false;
+});
 
 const users = userStore.users;
 
-function addUser() {
-  if (!newUserId.value.trim() || !newUserName.value.trim()) return;
-  userStore.addUser({
-    id: newUserId.value,
-    telegramId: newUserId.value,
-    name: newUserName.value,
-    role: newUserRole.value
-  });
-  newUserId.value = '';
-  newUserName.value = '';
-  newUserRole.value = 'employee';
+async function addUser() {
+  formError.value = '';
+  notifyMsg.value = '';
+  if (!/^\d+$/.test(newUserId.value.trim())) {
+    formError.value = 'Telegram ID должен быть числом';
+    return;
+  }
+  if (!newUserName.value.trim()) {
+    formError.value = 'Имя не может быть пустым';
+    return;
+  }
+  if (!['manager', 'employee'].includes(newUserRole.value)) {
+    formError.value = 'Выберите роль';
+    return;
+  }
+  try {
+    loading.value = true;
+    await userStore.addUser({
+      id: newUserId.value,
+      telegramId: newUserId.value,
+      name: newUserName.value,
+      role: newUserRole.value
+    });
+    newUserId.value = '';
+    newUserName.value = '';
+    newUserRole.value = 'employee';
+    notifyMsg.value = 'Пользователь успешно добавлен!';
+    setTimeout(() => notifyMsg.value = '', 2500);
+    await userStore.fetchUsers();
+  } catch (e) {
+    formError.value = 'Ошибка при добавлении пользователя: ' + (e?.message || e);
+  } finally {
+    loading.value = false;
+  }
 }
 
-function removeUser(telegramId: string) {
-  userStore.removeUser(telegramId);
+async function removeUser(telegramId: string) {
+  formError.value = '';
+  notifyMsg.value = '';
+  try {
+    loading.value = true;
+    await userStore.removeUser(telegramId);
+    notifyMsg.value = 'Пользователь удалён';
+    setTimeout(() => notifyMsg.value = '', 2500);
+    await userStore.fetchUsers();
+  } catch (e) {
+    formError.value = 'Ошибка при удалении пользователя: ' + (e?.message || e);
+  } finally {
+    loading.value = false;
+  }
 }
 
-function changeRole(user: any) {
-  userStore.setRole(user.telegramId, user.role);
+async function changeRole(user: any) {
+  formError.value = '';
+  notifyMsg.value = '';
+  try {
+    loading.value = true;
+    await userStore.setRole(user.telegramId, user.role);
+    notifyMsg.value = 'Роль обновлена';
+    setTimeout(() => notifyMsg.value = '', 2500);
+    await userStore.fetchUsers();
+  } catch (e) {
+    formError.value = 'Ошибка при смене роли: ' + (e?.message || e);
+  } finally {
+    loading.value = false;
+  }
 }
 </script>
 
 <style scoped>
 .user-admin {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: #23282d;
+  padding: 28px 24px 18px 24px;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.18);
   max-width: 600px;
   margin: 30px auto;
+  color: #f5f6fa;
 }
 form {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 20px;
 }
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 8px;
   margin-bottom: 20px;
+  background: #181c1f;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0a1a0e22;
 }
 th, td {
-  border: 1px solid #eee;
-  padding: 8px;
+  border: none;
+  padding: 12px 10px;
   text-align: left;
+  font-size: 1.05rem;
+}
+th {
+  color: #b6ffb0;
+  font-weight: 700;
+  background: #23282d;
+}
+td {
+  background: #23282d;
+  border-radius: 8px;
 }
 select, input {
-  padding: 5px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1.5px solid #2e4e3f;
+  background: #181c1f;
+  color: #f5f6fa;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+}
+select:focus, input:focus {
+  border: 1.5px solid #b6ffb0;
 }
 button {
-  padding: 6px 12px;
-  border-radius: 4px;
-  border: none;
-  background: #0088cc;
-  color: #fff;
-  cursor: pointer;
+  min-width: 90px;
 }
 button[disabled] {
-  background: #ccc;
+  background: #2e4e3f;
+  color: #b6ffb0aa;
   cursor: not-allowed;
+}
+.form-error {
+  color: #ff6b6b;
+  margin-bottom: 10px;
+}
+.notify {
+  color: #388e3c;
+  background: #e8f5e9;
+  border: 1px solid #c8e6c9;
+  padding: 8px;
+  border-radius: 4px;
+  margin-bottom: 10px;
 }
 </style> 

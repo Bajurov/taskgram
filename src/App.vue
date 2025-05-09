@@ -39,48 +39,73 @@ function logout() {
 }
 
 body {
-  font-family: 'Roboto', sans-serif;
-  background-color: #f5f5f5;
-  color: #333;
+  font-family: 'Inter', 'SF Pro Display', 'SF Pro Icons', 'Avenir Next', 'system-ui', '-apple-system', BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  background: #181c1f;
+  color: #f5f6fa;
+  letter-spacing: 0.01em;
 }
 
 .app-container {
-  max-width: 100%;
+  max-width: 100vw;
   min-height: 100vh;
+  background: #181c1f;
 }
 
 .app-header {
-  background-color: #0088cc;
-  color: white;
-  padding: 10px 20px;
+  background: linear-gradient(90deg, #1e2a22 0%, #1a3c2b 100%);
+  color: #fff;
+  padding: 18px 24px 14px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.18);
+  border-bottom: 1.5px solid #22332a;
+}
+
+.app-header h1 {
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #b6ffb0;
+  text-shadow: 0 2px 8px #0a1a0e44;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
+}
+
+.user-info span {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e0ffe0;
 }
 
 button {
-  background-color: #0077b6;
-  color: white;
+  background: linear-gradient(90deg, #2e4e3f 0%, #1a3c2b 100%);
+  color: #b6ffb0;
   border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
+  border-radius: 18px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  max-width: 100%;
-  word-break: break-word;
+  box-shadow: 0 2px 8px 0 #0a1a0e22;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
 
 button:hover {
-  background-color: #006199;
+  background: linear-gradient(90deg, #3fa34d 0%, #1a3c2b 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px 0 #0a1a0e44;
 }
 
 main {
-  padding: 20px;
+  padding: 32px 0 0 0;
+  min-height: 80vh;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 @media (max-width: 600px) {
@@ -93,11 +118,8 @@ main {
     box-sizing: border-box;
     margin-bottom: 10px;
   }
-  .projects-list, .tasks-list, .accesses-list {
-    grid-template-columns: 1fr !important;
-  }
   main {
-    padding: 5px;
+    padding: 5px 0 0 0;
   }
 }
 </style> 
