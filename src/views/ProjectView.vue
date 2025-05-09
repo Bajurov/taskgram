@@ -227,6 +227,7 @@ function goBack() {
 
 onMounted(() => {
   tasksStore.fetchTasks();
+  userStore.fetchUsers();
 });
 </script>
 
