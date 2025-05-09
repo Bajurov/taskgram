@@ -1,4 +1,9 @@
 <template>
+  <div>
+    <pre>route: {{ route.params.id }}</pre>
+    <pre>project: {{ project }}</pre>
+    <pre>user: {{ userStore.currentUser }}</pre>
+  </div>
   <div v-if="project" class="project-view">
     <button class="back-btn" @click="goBack">← Назад к проектам</button>
     <div class="project-header">
