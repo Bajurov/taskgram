@@ -99,7 +99,9 @@ const filteredProjects = computed(() => {
 const debugProjectId = ref<string | null>(null);
 
 function navigateToProject(id: string) {
-  router.push(`/project/${id}`);
+  router.push(`/project/${id}`)
+    .then(() => console.log('router.push resolved'))
+    .catch(e => console.error('router.push error', e));
 }
 
 function addProject() {
