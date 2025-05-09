@@ -7,7 +7,7 @@ interface Access {
   login: string;
   password: string;
   comment?: string;
-  projectId: string;
+  projectid: string;
 }
 
 export const useAccessStore = defineStore('access', {
@@ -18,14 +18,14 @@ export const useAccessStore = defineStore('access', {
   }),
 
   actions: {
-    async fetchAccesses(projectId: string) {
+    async fetchAccesses(projectid: string) {
       this.loading = true;
       this.error = null;
       try {
         const { data, error } = await supabase
           .from('accesses')
           .select('*')
-          .eq('projectId', projectId);
+          .eq('projectid', projectid);
 
         if (error) throw error;
         this.accesses = data || [];

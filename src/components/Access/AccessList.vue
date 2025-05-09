@@ -43,14 +43,14 @@ import { useAccessStore } from '../../store/access';
 import Spinner from '../User/Spinner.vue';
 
 const props = defineProps<{
-  projectId: string;
+  projectid: string;
 }>();
 
 const accessStore = useAccessStore();
 const { accesses, loading, error } = accessStore;
 
 onMounted(async () => {
-  await accessStore.fetchAccesses(props.projectId);
+  await accessStore.fetchAccesses(props.projectid);
 });
 
 async function removeAccess(id: string) {

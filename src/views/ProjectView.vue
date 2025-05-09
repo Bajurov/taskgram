@@ -1,9 +1,4 @@
 <template>
-  <div>
-    <pre>route: {{ route.params.id }}</pre>
-    <pre>project: {{ project }}</pre>
-    <pre>user: {{ userStore.currentUser }}</pre>
-  </div>
   <div v-if="project" class="project-view">
     <button class="back-btn" @click="goBack">← Назад к проектам</button>
     <div class="project-header">
@@ -35,7 +30,7 @@
         
         <TaskForm 
           v-if="showTaskForm" 
-          :projectId="route.params.id as string"
+          :projectid="route.params.id as string"
           @task-added="showTaskForm = false"
         />
         
@@ -70,11 +65,11 @@
         
         <AccessForm 
           v-if="showAccessForm" 
-          :projectId="route.params.id as string"
+          :projectid="route.params.id as string"
           @access-added="showAccessForm = false"
         />
         
-        <AccessList :projectId="route.params.id as string" />
+        <AccessList :projectid="route.params.id as string" />
       </div>
     </div>
   </div>
@@ -186,7 +181,7 @@ function addTask() {
     title: newTask.value.title,
     description: newTask.value.description,
     deadline: newTask.value.deadline,
-    projectId: route.params.id as string,
+    projectid: route.params.id as string,
     creatorId: userStore.currentUser?.id || '',
     assignees: selectedAssignees.value,
     status: 'new',
@@ -206,7 +201,7 @@ function addAccess() {
   
   accessStore.addAccess({
     id: Date.now().toString(),
-    projectId: route.params.id as string,
+    projectid: route.params.id as string,
     url: newAccess.value.url,
     login: newAccess.value.login,
     password: newAccess.value.password,

@@ -33,7 +33,7 @@ const emit = defineEmits<{
   (e: 'access-added'): void;
 }>();
 
-const props = defineProps<{ projectId: string }>();
+const props = defineProps<{ projectid: string }>();
 const url = ref('');
 const login = ref('');
 const password = ref('');
@@ -68,7 +68,7 @@ async function create() {
       login: login.value,
       password: password.value,
       comment: comment.value,
-      projectId: props.projectId
+      projectid: props.projectid
     });
     
     url.value = '';

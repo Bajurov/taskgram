@@ -48,7 +48,7 @@ const emit = defineEmits<{
   (e: 'task-added'): void;
 }>();
 
-const props = defineProps<{ projectId: string }>();
+const props = defineProps<{ projectid: string }>();
 const title = ref('');
 const description = ref('');
 const deadline = ref('');
@@ -102,7 +102,7 @@ async function create() {
       title: title.value,
       description: description.value,
       deadline: deadline.value,
-      projectId: props.projectId,
+      projectid: props.projectid,
       creatorId: userStore.currentUser!.id,
       status: 'new'
     });
