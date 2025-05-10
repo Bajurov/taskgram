@@ -1,5 +1,6 @@
 <template>
-  <div v-if="task" class="task-container">
+  <div v-if="tasksStore.loading" class="loading">Загрузка задач...</div>
+  <div v-else-if="task" class="task-container">
     <button class="back-btn" @click="goBack">← Назад к проекту</button>
     <div class="task-header">
       <div class="task-status" :class="task.status">
@@ -9,7 +10,7 @@
     </div>
     <!-- ВРЕМЕННО для отладки -->
     <pre style="background:#f8f8f8; color:#333; padding:8px; border-radius:4px; font-size:12px;">task: {{ task }}
-tasks: {{ tasksStore.tasks }}
+tasks ids: {{ tasksStore.tasks.map(t => t.id) }}
 route id: {{ route.params.id }}
 user: {{ userStore.currentUser }}</pre>
     <!-- /ВРЕМЕННО -->
@@ -104,9 +105,7 @@ user: {{ userStore.currentUser }}</pre>
       </div>
     </div>
   </div>
-  <div v-else class="loading">
-    Загрузка задачи...
-  </div>
+  <div v-else class="loading">Задача не найдена</div>
 </template>
 
 <script setup lang="ts">
@@ -127,7 +126,7 @@ const newComment = ref('');
 const confirmDelete = ref(false);
 
 const task = computed(() => 
-  tasksStore.tasks.find(t => t.id === route.params.id)
+  tasksStore.tasks.find(t => String(t.id) === String(route.params.id))
 );
 
 const projectName = computed(() => {
