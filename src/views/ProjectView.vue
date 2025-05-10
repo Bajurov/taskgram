@@ -45,22 +45,63 @@
           @task-added="showTaskForm = false"
         />
         
-        <div class="tasks-list">
-          <div v-if="filteredTasks.length === 0" class="empty-message">
-            Нет задач
+        <div class="tasks-view-switch">
+          <button :class="{active: tasksView === 'list'}" @click="tasksView = 'list'">Список</button>
+          <button :class="{active: tasksView === 'kanban'}" @click="tasksView = 'kanban'">Канбан</button>
+        </div>
+        
+        <div v-if="tasksView === 'list'">
+          <div class="tasks-filters">
+            <select v-model="filterStatus">
+              <option value="">Все статусы</option>
+              <option v-for="(label, key) in taskStatusLabels" :key="key" :value="key">{{ label }}</option>
+            </select>
+            <select v-model="filterAssignee">
+              <option value="">Все исполнители</option>
+              <option v-for="user in employees" :key="user.id" :value="user.id">{{ user.name }}</option>
+            </select>
           </div>
-          <div 
-            v-for="task in filteredTasks" 
-            :key="task.id" 
-            class="task-card"
-            @click="navigateToTask(task.id)"
-          >
-            <div class="task-status" :class="task.status">
-              {{ taskStatusLabels[task.status] }}
+          <div class="tasks-list">
+            <div v-if="filteredTasksList.length === 0" class="empty-message">
+              Нет задач
             </div>
-            <div class="task-title">{{ task.title }}</div>
-            <div class="task-details">
-              <div>Дедлайн: {{ formatDate(task.deadline) }}</div>
+            <div 
+              v-for="task in filteredTasksList" 
+              :key="task.id" 
+              class="task-card"
+              @click="navigateToTask(task.id)"
+            >
+              <div class="task-status" :class="task.status">
+                {{ taskStatusLabels[task.status] }}
+              </div>
+              <div class="task-title">{{ task.title }}</div>
+              <div class="task-details">
+                <div>Дедлайн: {{ formatDate(task.deadline) }}</div>
+                <div>Исполнители: <span v-if="task.assignees.length">{{ task.assignees.map(id => getUsername(id, true)).join(', ') }}</span><span v-else>Не назначены</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else class="kanban-board">
+          <div v-for="(label, status) in taskStatusLabels" :key="status" class="kanban-column"
+            @dragover.prevent
+            @drop="onDrop(status)"
+          >
+            <div class="kanban-column-title">{{ label }}</div>
+            <div class="kanban-tasks">
+              <div v-for="task in kanbanTasks[status]" :key="task.id" class="task-card"
+                :class="{ dragging: draggingTaskId === task.id }"
+                draggable="true"
+                @dragstart="onDragStart(task.id)"
+                @dragend="onDragEnd"
+                @click="navigateToTask(task.id)"
+              >
+                <div class="task-title">{{ task.title }}</div>
+                <div class="task-details">
+                  <div>Дедлайн: {{ formatDate(task.deadline) }}</div>
+                  <div>Исполнители: <span v-if="task.assignees.length">{{ task.assignees.map(id => getUsername(id, true)).join(', ') }}</span><span v-else>Не назначены</span></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -114,6 +155,10 @@ const userStore = useUserStore();
 
 const showTaskForm = ref(false);
 const showAccessForm = ref(false);
+const tasksView = ref('list');
+const filterStatus = ref('');
+const filterAssignee = ref('');
+
 const selectedAssignees = ref<string[]>([]);
 
 const newTask = ref({
@@ -133,20 +178,8 @@ const project = computed(() =>
   projectsStore.projects.find(p => p.id === route.params.id)
 );
 
-const filteredTasks = computed(() => {
-  if (userStore.currentUser?.role === 'employee') {
-    return tasksStore.getTasksByProject(route.params.id as string)
-      .filter(t => t.assignees.includes(userStore.currentUser?.id || ''));
-  }
-  return tasksStore.getTasksByProject(route.params.id as string);
-});
-
-const projectAccesses = computed(() => 
-  accessStore.getAccessesByProject(route.params.id as string)
-);
-
 const employees = computed(() => 
-  users.filter(u => u.role === 'employee')
+  userStore.users.filter(u => u.role === 'employee')
 );
 
 const taskStatusLabels = {
@@ -155,6 +188,36 @@ const taskStatusLabels = {
   'done': 'Готова',
   'backlog': 'Беклог'
 };
+
+function getUsername(id, preferStore = false) {
+  if (preferStore && userStore.users && userStore.users.length) {
+    const user = userStore.users.find(u => u.id === id);
+    if (user) return user.name;
+  }
+  const user = users.find(u => u.id === id);
+  return user ? user.name : id;
+}
+
+const filteredTasksList = computed(() => {
+  let tasks = tasksStore.getTasksByProject(route.params.id as string);
+  if (filterStatus.value) {
+    tasks = tasks.filter(t => t.status === filterStatus.value);
+  }
+  if (filterAssignee.value) {
+    tasks = tasks.filter(t => t.assignees.includes(filterAssignee.value));
+  }
+  return tasks;
+});
+
+const kanbanTasks = computed(() => {
+  const all = tasksStore.getTasksByProject(route.params.id as string);
+  return {
+    new: all.filter(t => t.status === 'new'),
+    in_progress: all.filter(t => t.status === 'in_progress'),
+    done: all.filter(t => t.status === 'done'),
+    backlog: all.filter(t => t.status === 'backlog')
+  };
+});
 
 function formatDate(dateString: string) {
   const date = new Date(dateString);
@@ -233,6 +296,24 @@ function addAccess() {
 
 function goBack() {
   router.push('/');
+}
+
+const draggingTaskId = ref<string | null>(null);
+
+function onDragStart(taskId: string) {
+  draggingTaskId.value = taskId;
+}
+function onDragEnd() {
+  draggingTaskId.value = null;
+}
+function onDrop(newStatus: string) {
+  if (!draggingTaskId.value) return;
+  const task = tasksStore.tasks.find(t => t.id === draggingTaskId.value);
+  if (task && task.status !== newStatus) {
+    task.status = newStatus;
+    tasksStore.updateTask(task);
+  }
+  draggingTaskId.value = null;
 }
 
 onMounted(() => {
@@ -386,6 +467,44 @@ onMounted(() => {
   height: 18px;
 }
 
+.tasks-view-switch {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.tasks-view-switch button {
+  background: #23282d;
+  color: #b6ffb0;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tasks-view-switch button.active {
+  background: #b6ffb0;
+  color: #23282d;
+}
+
+.tasks-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.tasks-filters select {
+  padding: 7px 14px;
+  border-radius: 6px;
+  border: 1.5px solid #2e4e3f;
+  background: #181c1f;
+  color: #b6ffb0;
+  font-size: 1rem;
+}
+
 .tasks-list {
   display: grid;
   gap: 16px;
@@ -456,5 +575,42 @@ onMounted(() => {
   color: #888;
   text-align: center;
   padding: 40px;
+}
+
+.kanban-board {
+  display: flex;
+  gap: 18px;
+  margin-top: 10px;
+}
+
+.kanban-column {
+  background: #181c1f;
+  border-radius: 10px;
+  padding: 12px 8px 8px 8px;
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 200px;
+}
+
+.kanban-column-title {
+  color: #b6ffb0;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.kanban-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task-card.dragging {
+  opacity: 0.5;
+  border: 2px dashed #b6ffb0;
 }
 </style> 

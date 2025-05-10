@@ -16,7 +16,7 @@
         <strong>Дедлайн:</strong> {{ formatDate(task.deadline) }}
       </div>
       <div class="meta-item">
-        <strong>Постановщик:</strong> {{ getUsername(task.creatorid) }}
+        <strong>Постановщик:</strong> {{ getUsername(task.creatorid, true) }}
       </div>
       <div class="meta-item">
         <strong>Исполнители:</strong>
@@ -26,9 +26,42 @@
         <span v-else>Не назначены</span>
       </div>
     </div>
+    <div v-if="canChangeStatus" class="status-actions">
+      <h3>Изменить статус</h3>
+      <div class="status-buttons">
+        <button 
+          v-for="(label, status) in taskStatusLabels" 
+          :key="status"
+          :disabled="task.status === status"
+          :class="[status, { active: task.status === status }]"
+          @click="changeStatus(status)"
+        >
+          {{ label }}
+        </button>
+      </div>
+    </div>
     <div class="task-description">
       <h3>Описание</h3>
       <p>{{ task.description }}</p>
+    </div>
+    <div v-if="canDelete" class="delete-task-action">
+      <button class="delete-task-btn" @click="showDeletePopup = true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="12" fill="#ff6b6b"/>
+          <path d="M8 12h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Удалить задачу
+      </button>
+    </div>
+    <div v-if="showDeletePopup" class="delete-popup-overlay">
+      <div class="delete-popup">
+        <div class="delete-popup-title">Удалить задачу?</div>
+        <div class="delete-popup-desc">Вы уверены, что хотите безвозвратно удалить задачу <b>{{ task.title }}</b>? Это действие нельзя отменить.</div>
+        <div class="delete-popup-actions">
+          <button @click="deleteTaskConfirmed" class="delete-confirm-btn">Удалить</button>
+          <button @click="showDeletePopup = false" class="delete-cancel-btn">Отмена</button>
+        </div>
+      </div>
     </div>
     <div class="task-chat">
       <h3 class="chat-title">Обсуждение</h3>
@@ -54,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '../store/user';
 import { useTasksStore } from '../store/tasks';
 import { useProjectsStore } from '../store/projects';
@@ -62,11 +95,13 @@ import { onMounted, computed, ref } from 'vue';
 import { users as mockUsers } from '../api/mockData';
 
 const route = useRoute();
+const router = useRouter();
 const userStore = useUserStore();
 const tasksStore = useTasksStore();
 const projectsStore = useProjectsStore();
 
 const newComment = ref('');
+const showDeletePopup = ref(false);
 
 onMounted(() => {
   tasksStore.fetchTasks();
@@ -124,6 +159,34 @@ function addComment() {
     createdat: new Date().toISOString()
   });
   newComment.value = '';
+}
+
+function changeStatus(status) {
+  if (task.value && task.value.status !== status) {
+    task.value.status = status;
+    tasksStore.updateTask(task.value);
+  }
+}
+
+const canChangeStatus = computed(() => {
+  if (!task.value || !userStore.currentUser) return false;
+  const isAssignee = task.value.assignees && task.value.assignees.includes(userStore.currentUser.id);
+  const isCreator = task.value.creatorid === userStore.currentUser.id;
+  const isManager = userStore.currentUser.role === 'manager' || userStore.currentUser.role === 'owner';
+  return isAssignee || isCreator || isManager;
+});
+
+const canDelete = computed(() => {
+  if (!task.value || !userStore.currentUser) return false;
+  const isManager = userStore.currentUser.role === 'manager' || userStore.currentUser.role === 'owner';
+  return isManager;
+});
+
+async function deleteTaskConfirmed() {
+  if (!task.value) return;
+  await tasksStore.deleteTask(task.value.id);
+  showDeletePopup.value = false;
+  router.push(`/project/${task.value.projectid}`);
 }
 
 function goBack() {
@@ -318,5 +381,129 @@ function goBack() {
 
 .back-btn:hover {
   text-decoration: underline;
+}
+
+.status-actions {
+  margin-bottom: 24px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+.status-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.status-buttons button {
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.status-buttons button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+.status-buttons button.new {
+  background-color: #17a2b8;
+}
+.status-buttons button.in_progress {
+  background-color: #ffc107;
+  color: black;
+}
+.status-buttons button.done {
+  background-color: #28a745;
+}
+.status-buttons button.backlog {
+  background-color: #6c757d;
+}
+
+.delete-task-action {
+  margin: 18px 0 0 0;
+  display: flex;
+  justify-content: flex-end;
+}
+.delete-task-btn {
+  background: #ff6b6b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+.delete-task-btn:hover {
+  background: #e53935;
+}
+.delete-popup-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.delete-popup {
+  background: #23282d;
+  border-radius: 14px;
+  padding: 32px 28px 24px 28px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+  max-width: 400px;
+  color: #f5f6fa;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.delete-popup-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ff6b6b;
+}
+.delete-popup-desc {
+  font-size: 1.05rem;
+  color: #eaffd0;
+}
+.delete-popup-actions {
+  display: flex;
+  gap: 18px;
+  justify-content: flex-end;
+}
+.delete-confirm-btn {
+  background: #ff6b6b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.delete-confirm-btn:hover {
+  background: #e53935;
+}
+.delete-cancel-btn {
+  background: #2e4e3f;
+  color: #b6ffb0;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.delete-cancel-btn:hover {
+  background: #3a6650;
 }
 </style>
