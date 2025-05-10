@@ -1,5 +1,11 @@
 <template>
   <div class="app-container">
+    <div style="background:#ffe; color:#900; padding:10px; font-size:16px; margin-bottom:8px;">
+      USER: {{ userStore.currentUser }}<br>
+      ROUTE: {{ $route.fullPath }}<br>
+      ROUTE NAME: {{ $route.name }}<br>
+      ROUTE PARAMS: {{ $route.params }}
+    </div>
     <header v-if="userStore.currentUser" class="app-header-table">
       <div class="header-table">
         <div class="header-row">
