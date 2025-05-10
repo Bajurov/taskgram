@@ -20,6 +20,13 @@
     </div>
     
     <div class="project-content">
+      <div style="background:#ffe; color:#900; padding:10px; font-size:14px; margin-bottom:8px;">
+        <div><b>project:</b> {{ project }}</div>
+        <div><b>tasks:</b> {{ tasksStore.tasks }}</div>
+        <div><b>users:</b> {{ userStore.users }}</div>
+        <div><b>filteredTasksList:</b> {{ filteredTasksList }}</div>
+        <div><b>kanbanTasks:</b> {{ kanbanTasks }}</div>
+      </div>
       <div class="tasks-section">
         <div class="section-header">
           <div class="section-title">Задачи</div>
