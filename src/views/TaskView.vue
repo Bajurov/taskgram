@@ -9,10 +9,13 @@
       <h2>{{ task.title }}</h2>
     </div>
     <!-- ВРЕМЕННО для отладки -->
-    <pre style="background:#f8f8f8; color:#333; padding:8px; border-radius:4px; font-size:12px;">task: {{ task }}
-tasks ids: {{ tasksStore.tasks.map(t => t.id) }}
-route id: {{ route.params.id }}
-user: {{ userStore.currentUser }}</pre>
+    <pre style="background:#f8f8f8; color:#333; padding:8px; border-radius:4px; font-size:12px;">
+      tasks: {{ tasksStore.tasks }}
+      tasks ids: {{ tasksStore.tasks.map(t => t.id) }}
+      route id: {{ route.params.id }}
+      user: {{ userStore.currentUser }}
+      task: {{ task }}
+    </pre>
     <!-- /ВРЕМЕННО -->
     <div class="task-meta">
       <div class="meta-item">
