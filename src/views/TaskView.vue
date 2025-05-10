@@ -8,15 +8,15 @@
       </div>
       <h2>{{ task.title }}</h2>
     </div>
-    <!-- ВРЕМЕННО для отладки -->
-    <pre style="background:#f8f8f8; color:#333; padding:8px; border-radius:4px; font-size:12px;">
-      tasks: {{ tasksStore.tasks }}
-      tasks ids: {{ tasksStore.tasks.map(t => t.id) }}
-      route id: {{ route.params.id }}
-      user: {{ userStore.currentUser }}
-      task: {{ task }}
-    </pre>
-    <!-- /ВРЕМЕННО -->
+    <div style="background:#ffe; color:#900; padding:10px; font-size:16px; margin-bottom:8px;">
+      <div><b>tasksStore.loading:</b> {{ tasksStore.loading }}</div>
+      <div><b>tasksStore.error:</b> {{ tasksStore.error }}</div>
+      <div><b>tasksStore.tasks:</b> {{ tasksStore.tasks }}</div>
+      <div><b>tasks ids:</b> {{ tasksStore.tasks.map(t => t.id) }}</div>
+      <div><b>route id:</b> {{ route.params.id }}</div>
+      <div><b>user:</b> {{ userStore.currentUser }}</div>
+      <div><b>task:</b> {{ task }}</div>
+    </div>
     <div class="task-meta">
       <div class="meta-item">
         <strong>Проект:</strong> {{ projectName }}
