@@ -10,7 +10,7 @@
     </div>
     <div class="task-meta">
       <div class="meta-item">
-        <strong>Проект:</strong> {{ projectName }}
+        <strong>Проект:</strong> {{ projectTitle }}
       </div>
       <div class="meta-item">
         <strong>Дедлайн:</strong> {{ formatDate(task.deadline) }}
@@ -31,7 +31,7 @@
       <p>{{ task.description }}</p>
     </div>
     <div class="task-chat">
-      <h3>Обсуждение</h3>
+      <h3 class="chat-title">Обсуждение</h3>
       <div class="chat-messages">
         <div v-if="!task.comments || !task.comments.length" class="empty-chat">
           Нет сообщений. Будьте первым!
@@ -45,8 +45,8 @@
         </div>
       </div>
       <div class="chat-input">
-        <textarea v-model="newComment" placeholder="Напишите сообщение..." @keyup.enter="addComment"></textarea>
-        <button @click="addComment">Отправить</button>
+        <textarea v-model="newComment" placeholder="Напишите сообщение..." class="comment-textarea"></textarea>
+        <button class="send-btn" @click="addComment">Отправить</button>
       </div>
     </div>
   </div>
@@ -57,27 +57,30 @@
 import { useRoute } from 'vue-router';
 import { useUserStore } from '../store/user';
 import { useTasksStore } from '../store/tasks';
+import { useProjectsStore } from '../store/projects';
 import { onMounted, computed, ref } from 'vue';
 import { users } from '../api/mockData';
 
 const route = useRoute();
 const userStore = useUserStore();
 const tasksStore = useTasksStore();
+const projectsStore = useProjectsStore();
 
 const newComment = ref('');
 
 onMounted(() => {
   tasksStore.fetchTasks();
+  projectsStore.fetchProjects();
 });
 
 const task = computed(() =>
   tasksStore.tasks.find(t => String(t.id) === String(route.params.id))
 );
 
-const projectName = computed(() => {
+const projectTitle = computed(() => {
   if (!task.value) return '';
-  // Здесь предполагается, что проект уже загружен в сторе, иначе можно просто вывести projectid
-  return task.value.projectid;
+  const project = projectsStore.projects.find(p => p.id === task.value.projectid);
+  return project ? project.title : task.value.projectid;
 });
 
 const taskStatusLabels = {
@@ -198,16 +201,20 @@ function goBack() {
   padding-top: 20px;
 }
 
-.task-chat h3 {
+.task-chat h3.chat-title {
   margin-bottom: 15px;
+  color: #6c8e4e;
+  font-size: 1.2em;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .chat-messages {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  margin-bottom: 20px;
-  max-height: 400px;
+  margin-bottom: 16px;
+  max-height: 300px;
   overflow-y: auto;
 }
 
@@ -218,10 +225,11 @@ function goBack() {
 }
 
 .chat-message {
-  padding: 12px;
+  padding: 10px 14px;
   border-radius: 8px;
   background-color: #f1f1f1;
   max-width: 80%;
+  font-size: 15px;
 }
 
 .own-message {
@@ -232,12 +240,13 @@ function goBack() {
 .message-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 5px;
-  font-size: 14px;
+  margin-bottom: 4px;
+  font-size: 13px;
 }
 
 .message-time {
   color: #777;
+  font-size: 12px;
 }
 
 .message-text {
@@ -247,15 +256,38 @@ function goBack() {
 .chat-input {
   display: flex;
   gap: 10px;
+  align-items: flex-end;
+  margin-top: 8px;
 }
 
-.chat-input textarea {
+.comment-textarea {
   flex: 1;
-  height: 80px;
+  min-height: 48px;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   resize: none;
+  font-size: 15px;
+}
+
+.send-btn {
+  background: #234c2e;
+  color: #b6ffb0;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  min-width: unset;
+  height: 42px;
+  margin-left: 0;
+}
+
+.send-btn:hover {
+  background: #3fa34d;
+  color: #fff;
 }
 
 .loading {
