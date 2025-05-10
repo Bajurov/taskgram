@@ -21,7 +21,7 @@
       <div class="meta-item">
         <strong>Исполнители:</strong>
         <span v-if="task.assignees && task.assignees.length">
-          {{ task.assignees.map(id => getUsername(id)).join(', ') }}
+          {{ task.assignees.map(id => getUsername(id, true)).join(', ') }}
         </span>
         <span v-else>Не назначены</span>
       </div>
@@ -38,7 +38,7 @@
         </div>
         <div v-for="comment in task.comments" :key="comment.id" class="chat-message" :class="{ 'own-message': comment.authorid === userStore.currentUser?.id }">
           <div class="message-header">
-            <strong>{{ getUsername(comment.authorid) }}</strong>
+            <strong>{{ getUsername(comment.authorid, true) }}</strong>
             <span class="message-time">{{ formatDateTime(comment.createdat) }}</span>
           </div>
           <div class="message-text">{{ comment.text }}</div>
@@ -59,7 +59,7 @@ import { useUserStore } from '../store/user';
 import { useTasksStore } from '../store/tasks';
 import { useProjectsStore } from '../store/projects';
 import { onMounted, computed, ref } from 'vue';
-import { users } from '../api/mockData';
+import { users as mockUsers } from '../api/mockData';
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -71,6 +71,7 @@ const newComment = ref('');
 onMounted(() => {
   tasksStore.fetchTasks();
   projectsStore.fetchProjects();
+  userStore.fetchUsers();
 });
 
 const task = computed(() =>
@@ -90,8 +91,12 @@ const taskStatusLabels = {
   'backlog': 'Беклог'
 };
 
-function getUsername(id) {
-  const user = users.find(u => u.id === id);
+function getUsername(id, preferStore = false) {
+  if (preferStore && userStore.users && userStore.users.length) {
+    const user = userStore.users.find(u => u.id === id);
+    if (user) return user.name;
+  }
+  const user = mockUsers.find(u => u.id === id);
   return user ? user.name : id;
 }
 
@@ -255,19 +260,22 @@ function goBack() {
 
 .chat-input {
   display: flex;
-  gap: 10px;
-  align-items: flex-end;
+  flex-direction: column;
+  gap: 0;
+  align-items: stretch;
   margin-top: 8px;
 }
 
 .comment-textarea {
   flex: 1;
-  min-height: 48px;
-  padding: 10px;
+  min-height: 80px;
+  padding: 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
   resize: none;
   font-size: 15px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
 }
 
 .send-btn {
@@ -283,6 +291,7 @@ function goBack() {
   min-width: unset;
   height: 42px;
   margin-left: 0;
+  align-self: flex-end;
 }
 
 .send-btn:hover {
